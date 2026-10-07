@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -6,55 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>স্মার্ট ফিন্যান্স ও ওয়াইফাই ম্যানেজার</title>
     
-    <!-- কাস্টম অ্যাপ আইকন -->
+    <!-- অ্যাপ আইকন -->
     <link rel="icon" type="image/svg+xml" href="https://api.iconify.design/heroicons:wallet.svg">
     <link rel="apple-touch-icon" href="https://api.iconify.design/heroicons:wallet.svg">
     <meta name="theme-color" content="#1a56db">
 
-    <!-- PWA Manifest Configuration -->
+    <!-- PWA Manifest configuration -->
     <link rel="manifest" href='data:application/json,{"name":"Smart Finance App","short_name":"FinanceApp","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#1a56db","icons":[{"src":"https://api.iconify.design/heroicons:wallet.svg","sizes":"192x192","type":"image/svg+xml"}]}'>
 
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
+<body class="bg-gray-100 font-sans text-gray-800 pb-10">
 
     <!-- হেডার বার -->
     <header class="bg-blue-600 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-2">
             <i class="fas fa-wallet text-2xl"></i>
-            <h1 class="text-xl font-bold">স্মার্ট ফিন্যান্স ও ওয়াইফাই ম্যানেজার</h1>
+            <h1 class="text-lg font-bold">স্মার্ট ফিন্যান্স ও ওয়াইফাই ম্যানেজার</h1>
         </div>
         <div class="flex items-center space-x-2">
             <!-- অ্যাপ ইনস্টল বাটন -->
-            <button id="installAppBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold px-3 py-1.5 rounded-lg text-sm shadow flex items-center space-x-1 animate-pulse">
+            <button id="installAppBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow flex items-center space-x-1 animate-pulse">
                 <i class="fas fa-download"></i>
-                <span>অ্যাপ ইনস্টল</span>
+                <span>ইনস্টল</span>
             </button>
-            <button onclick="exportData()" class="bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded text-sm"><i class="fas fa-download mr-1"></i> ব্যাকআপ</button>
-            <button onclick="document.getElementById('importFile').click()" class="bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded text-sm"><i class="fas fa-upload mr-1"></i> রিস্টোর</button>
+            <button onclick="exportData()" class="bg-blue-700 hover:bg-blue-800 px-2.5 py-1.5 rounded text-xs"><i class="fas fa-download mr-1"></i>ব্যাকআপ</button>
+            <button onclick="document.getElementById('importFile').click()" class="bg-blue-700 hover:bg-blue-800 px-2.5 py-1.5 rounded text-xs"><i class="fas fa-upload mr-1"></i>রিস্টোর</button>
             <input type="file" id="importFile" class="hidden" onchange="importData(event)">
         </div>
     </header>
 
     <!-- নেভিগেশন ট্যাব -->
-    <nav class="bg-white shadow border-b">
+    <nav class="bg-white shadow border-b sticky top-[60px] z-40">
         <div class="max-w-4xl mx-auto flex overflow-x-auto text-sm font-semibold">
-            <button onclick="switchTab('dashboard')" class="tab-btn p-3 border-b-2 border-blue-600 text-blue-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-chart-pie"></i><span>ড্যাশবোর্ড</span></button>
-            <button onclick="switchTab('income')" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-money-bill-wave"></i><span>দৈনিক আয়</span></button>
-            <button onclick="switchTab('expense')" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-receipt"></i><span>দৈনিক ব্যয়</span></button>
-            <button onclick="switchTab('wifi')" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-wifi"></i><span>গ্রাহক ও বিল</span></button>
-            <button onclick="switchTab('savings')" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-piggy-bank"></i><span>সঞ্চয়</span></button>
-            <button onclick="switchTab('reminders')" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-bell"></i><span>রিমাইন্ডার</span></button>
-            <button onclick="switchTab('reports')" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-chart-line"></i><span>রিপোর্টস</span></button>
+            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn p-3 border-b-2 border-blue-600 text-blue-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-chart-pie"></i><span>ড্যাশবোর্ড</span></button>
+            <button onclick="switchTab('income')" id="btn-income" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-money-bill-wave"></i><span>দৈনিক আয়</span></button>
+            <button onclick="switchTab('expense')" id="btn-expense" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-receipt"></i><span>দৈনিক ব্যয়</span></button>
+            <button onclick="switchTab('wifi')" id="btn-wifi" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-wifi"></i><span>গ্রাহক ও বিল</span></button>
+            <button onclick="switchTab('savings')" id="btn-savings" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-piggy-bank"></i><span>সঞ্চয়</span></button>
+            <button onclick="switchTab('reminders')" id="btn-reminders" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-bell"></i><span>রিমাইন্ডার</span></button>
+            <button onclick="switchTab('reports')" id="btn-reports" class="tab-btn p-3 border-b-2 border-transparent text-gray-600 flex items-center space-x-2 whitespace-nowrap"><i class="fas fa-chart-line"></i><span>রিপোর্টস</span></button>
         </div>
     </nav>
 
-    <!-- মূল কনটেন্ট -->
+    <!-- মূল কন্টেন্ট -->
     <main class="max-w-4xl mx-auto p-4 space-y-6">
 
-        <!-- সামারি কার্ডস (Dashboard) -->
+        <!-- ১. ড্যাশবোর্ড ট্যাব -->
         <div id="tab-dashboard" class="tab-content space-y-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
@@ -92,10 +91,323 @@
             </div>
         </div>
 
+        <!-- ২. দৈনিক আয় ট্যাব -->
+        <div id="tab-income" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-lg shadow space-y-3">
+                <h2 class="text-lg font-bold border-b pb-2">নতুন আয় যুক্ত করুন</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="text" id="incSource" placeholder="আয়ের উৎস (যেমন: বেতন, ব্যবসা)" class="p-2 border rounded w-full">
+                    <input type="number" id="incAmount" placeholder="পরিমাণ (৳)" class="p-2 border rounded w-full">
+                    <input type="date" id="incDate" class="p-2 border rounded w-full">
+                </div>
+                <button onclick="addIncome()" class="bg-green-600 text-white px-4 py-2 rounded font-bold hover:bg-green-700 w-full md:w-auto">আয় যোগ করুন</button>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold mb-3">আয়ের তালিকা</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead><tr class="border-b bg-gray-50"><th class="p-2">তারিখ</th><th class="p-2">উৎস</th><th class="p-2">পরিমাণ</th><th class="p-2">অ্যাকশন</th></tr></thead>
+                        <tbody id="incomeList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ৩. দৈনিক ব্যয় ট্যাব -->
+        <div id="tab-expense" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-lg shadow space-y-3">
+                <h2 class="text-lg font-bold border-b pb-2">নতুন খরচ যুক্ত করুন</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="text" id="expCategory" placeholder="খরচের খাত (যেমন: বাজার, কারেন্ট বিল)" class="p-2 border rounded w-full">
+                    <input type="number" id="expAmount" placeholder="পরিমাণ (৳)" class="p-2 border rounded w-full">
+                    <input type="date" id="expDate" class="p-2 border rounded w-full">
+                </div>
+                <button onclick="addExpense()" class="bg-red-600 text-white px-4 py-2 rounded font-bold hover:bg-red-700 w-full md:w-auto">খরচ যোগ করুন</button>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold mb-3">খরচের তালিকা</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead><tr class="border-b bg-gray-50"><th class="p-2">তারিখ</th><th class="p-2">খাত</th><th class="p-2">পরিমাণ</th><th class="p-2">অ্যাকশন</th></tr></thead>
+                        <tbody id="expenseList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ৪. ওয়াইফাই গ্রাহক ও বিল ট্যাব -->
+        <div id="tab-wifi" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-lg shadow space-y-3">
+                <h2 class="text-lg font-bold border-b pb-2">নতুন ওয়াইফাই গ্রাহক যুক্ত করুন</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <input type="text" id="wifiName" placeholder="গ্রাহকের নাম" class="p-2 border rounded w-full">
+                    <input type="text" id="wifiPhone" placeholder="মোবাইল নম্বর" class="p-2 border rounded w-full">
+                    <input type="number" id="wifiBill" placeholder="মাসিক বিল (৳)" class="p-2 border rounded w-full">
+                    <select id="wifiStatus" class="p-2 border rounded w-full">
+                        <option value="Paid">পরিশোধিত</option>
+                        <option value="Due">বকেয়া</option>
+                    </select>
+                </div>
+                <button onclick="addWifiUser()" class="bg-blue-600 text-white px-4 py-2 rounded font-bold hover:bg-blue-700 w-full md:w-auto">গ্রাহক যোগ করুন</button>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold mb-3">গ্রাহক তালিকা</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead><tr class="border-b bg-gray-50"><th class="p-2">নাম</th><th class="p-2">মোবাইল</th><th class="p-2">বিল</th><th class="p-2">স্ট্যাটাস</th><th class="p-2">অ্যাকশন</th></tr></thead>
+                        <tbody id="wifiList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ৫. সঞ্চয় ট্যাব -->
+        <div id="tab-savings" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-lg shadow space-y-3">
+                <h2 class="text-lg font-bold border-b pb-2">সঞ্চয় জমা করুন</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="text" id="saveNote" placeholder="সঞ্চয়ের বিবরণ" class="p-2 border rounded w-full">
+                    <input type="number" id="saveAmount" placeholder="পরিমাণ (৳)" class="p-2 border rounded w-full">
+                    <input type="date" id="saveDate" class="p-2 border rounded w-full">
+                </div>
+                <button onclick="addSavings()" class="bg-yellow-600 text-white px-4 py-2 rounded font-bold hover:bg-yellow-700 w-full md:w-auto">সঞ্চয় জমা করুন</button>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold mb-3">সঞ্চয়ের হিসাব</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead><tr class="border-b bg-gray-50"><th class="p-2">তারিখ</th><th class="p-2">বিবরণ</th><th class="p-2">পরিমাণ</th><th class="p-2">অ্যাকশন</th></tr></thead>
+                        <tbody id="savingsList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ৬. রিমাইন্ডার ট্যাব -->
+        <div id="tab-reminders" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-lg shadow space-y-3">
+                <h2 class="text-lg font-bold border-b pb-2">নতুন রিমাইন্ডার দিন</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="text" id="remText" placeholder="কিসের রিমাইন্ডার?" class="p-2 border rounded w-full">
+                    <input type="date" id="remDate" class="p-2 border rounded w-full">
+                    <button onclick="addReminder()" class="bg-purple-600 text-white px-4 py-2 rounded font-bold hover:bg-purple-700 w-full">যোগ করুন</button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold mb-3">রিমাইন্ডার তালিকা</h3>
+                <ul id="reminderList" class="space-y-2"></ul>
+            </div>
+        </div>
+
+        <!-- ৭. রিপোর্টস ট্যাব -->
+        <div id="tab-reports" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-lg font-bold border-b pb-2 mb-3">সামগ্রিক সারসংক্ষেপ</h2>
+                <div id="reportSummary" class="space-y-2 text-sm"></div>
+            </div>
+        </div>
+
     </main>
 
-    <!-- PWA Install Trigger & Logic -->
+    <!-- জাভাস্ক্রিপ্ট অ্যাপ লজিক -->
     <script>
+        // ডাটাবেজ স্টোরেজ Init
+        let appData = JSON.parse(localStorage.getItem('smart_app_db')) || {
+            incomes: [],
+            expenses: [],
+            wifiUsers: [],
+            savings: [],
+            reminders: []
+        };
+
+        function saveData() {
+            localStorage.setItem('smart_app_db', JSON.stringify(appData));
+            renderAll();
+        }
+
+        // আজকের তারিখ ডিফল্ট সেট
+        document.querySelectorAll('input[type="date"]').forEach(input => {
+            if(!input.value) input.valueAsDate = new Date();
+        });
+
+        // ট্যাব সুইচ করার ফাংশন
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-blue-600', 'text-blue-600');
+                el.classList.add('border-transparent', 'text-gray-600');
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.remove('border-transparent', 'text-gray-600');
+                activeBtn.classList.add('border-blue-600', 'text-blue-600');
+            }
+        }
+
+        // আয় যোগ
+        function addIncome() {
+            const source = document.getElementById('incSource').value;
+            const amount = parseFloat(document.getElementById('incAmount').value);
+            const date = document.getElementById('incDate').value;
+            if(!source || isNaN(amount)) return alert('সঠিক তথ্য দিন!');
+            
+            appData.incomes.push({ id: Date.now(), source, amount, date });
+            document.getElementById('incSource').value = '';
+            document.getElementById('incAmount').value = '';
+            saveData();
+        }
+
+        // খরচ যোগ
+        function addExpense() {
+            const category = document.getElementById('expCategory').value;
+            const amount = parseFloat(document.getElementById('expAmount').value);
+            const date = document.getElementById('expDate').value;
+            if(!category || isNaN(amount)) return alert('সঠিক তথ্য দিন!');
+
+            appData.expenses.push({ id: Date.now(), category, amount, date });
+            document.getElementById('expCategory').value = '';
+            document.getElementById('expAmount').value = '';
+            saveData();
+        }
+
+        // ওয়াইফাই গ্রাহক যোগ
+        function addWifiUser() {
+            const name = document.getElementById('wifiName').value;
+            const phone = document.getElementById('wifiPhone').value;
+            const bill = parseFloat(document.getElementById('wifiBill').value);
+            const status = document.getElementById('wifiStatus').value;
+            if(!name || isNaN(bill)) return alert('সঠিক তথ্য দিন!');
+
+            appData.wifiUsers.push({ id: Date.now(), name, phone, bill, status });
+            document.getElementById('wifiName').value = '';
+            document.getElementById('wifiPhone').value = '';
+            document.getElementById('wifiBill').value = '';
+            saveData();
+        }
+
+        // সঞ্চয় যোগ
+        function addSavings() {
+            const note = document.getElementById('saveNote').value;
+            const amount = parseFloat(document.getElementById('saveAmount').value);
+            const date = document.getElementById('saveDate').value;
+            if(!note || isNaN(amount)) return alert('সঠিক তথ্য দিন!');
+
+            appData.savings.push({ id: Date.now(), note, amount, date });
+            document.getElementById('saveNote').value = '';
+            document.getElementById('saveAmount').value = '';
+            saveData();
+        }
+
+        // রিমাইন্ডার যোগ
+        function addReminder() {
+            const text = document.getElementById('remText').value;
+            const date = document.getElementById('remDate').value;
+            if(!text) return alert('বিবরণ লিখুন!');
+
+            appData.reminders.push({ id: Date.now(), text, date });
+            document.getElementById('remText').value = '';
+            saveData();
+        }
+
+        // ডেটা মোছার ফাংশন
+        function deleteItem(type, id) {
+            appData[type] = appData[type].filter(item => item.id !== id);
+            saveData();
+        }
+
+        function toggleWifiStatus(id) {
+            const user = appData.wifiUsers.find(u => u.id === id);
+            if(user) {
+                user.status = user.status === 'Paid' ? 'Due' : 'Paid';
+                saveData();
+            }
+        }
+
+        // স্ক্রিনে সব রেন্ডার করা
+        function renderAll() {
+            let totInc = appData.incomes.reduce((s, i) => s + i.amount, 0);
+            let totExp = appData.expenses.reduce((s, i) => s + i.amount, 0);
+            let totSav = appData.savings.reduce((s, i) => s + i.amount, 0);
+            let dueUsers = appData.wifiUsers.filter(u => u.status === 'Due');
+            
+            let todayStr = new Date().toISOString().split('T')[0];
+            let todayInc = appData.incomes.filter(i => i.date === todayStr).reduce((s, i) => s + i.amount, 0);
+            let todayExp = appData.expenses.filter(e => e.date === todayStr).reduce((s, e) => s + e.amount, 0);
+
+            // ড্যাশবোর্ড আপডেট
+            document.getElementById('totalBalance').innerText = `৳ ${(totInc - totExp - totSav).toLocaleString()}`;
+            document.getElementById('totalIncome').innerText = `৳ ${totInc.toLocaleString()}`;
+            document.getElementById('totalExpense').innerText = `৳ ${totExp.toLocaleString()}`;
+            document.getElementById('totalSavings').innerText = `৳ ${totSav.toLocaleString()}`;
+            document.getElementById('todayFinance').innerText = `৳ ${todayInc} / ৳ ${todayExp}`;
+            document.getElementById('dueWifiUsers').innerText = `${dueUsers.length} জন`;
+
+            // তালিকা রেন্ডারিং
+            document.getElementById('incomeList').innerHTML = appData.incomes.map(i => `
+                <tr class="border-b"><td class="p-2">${i.date}</td><td class="p-2">${i.source}</td><td class="p-2 text-green-600 font-bold">৳${i.amount}</td><td class="p-2"><button onclick="deleteItem('incomes', ${i.id})" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>
+            `).join('');
+
+            document.getElementById('expenseList').innerHTML = appData.expenses.map(e => `
+                <tr class="border-b"><td class="p-2">${e.date}</td><td class="p-2">${e.category}</td><td class="p-2 text-red-600 font-bold">৳${e.amount}</td><td class="p-2"><button onclick="deleteItem('expenses', ${e.id})" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>
+            `).join('');
+
+            document.getElementById('wifiList').innerHTML = appData.wifiUsers.map(w => `
+                <tr class="border-b">
+                    <td class="p-2">${w.name}</td>
+                    <td class="p-2">${w.phone || '-'}</td>
+                    <td class="p-2 font-bold">৳${w.bill}</td>
+                    <td class="p-2"><button onclick="toggleWifiStatus(${w.id})" class="px-2 py-0.5 rounded text-xs text-white ${w.status === 'Paid' ? 'bg-green-500' : 'bg-red-500'}">${w.status === 'Paid' ? 'পরিশোধিত' : 'বকেয়া'}</button></td>
+                    <td class="p-2"><button onclick="deleteItem('wifiUsers', ${w.id})" class="text-red-500"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            `).join('');
+
+            document.getElementById('savingsList').innerHTML = appData.savings.map(s => `
+                <tr class="border-b"><td class="p-2">${s.date}</td><td class="p-2">${s.note}</td><td class="p-2 text-yellow-600 font-bold">৳${s.amount}</td><td class="p-2"><button onclick="deleteItem('savings', ${s.id})" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>
+            `).join('');
+
+            document.getElementById('reminderList').innerHTML = appData.reminders.map(r => `
+                <li class="flex justify-between items-center p-2 bg-gray-50 rounded border">
+                    <span><strong>${r.date}:</strong> ${r.text}</span>
+                    <button onclick="deleteItem('reminders', ${r.id})" class="text-red-500"><i class="fas fa-trash"></i></button>
+                </li>
+            `).join('');
+
+            document.getElementById('reportSummary').innerHTML = `
+                <p>• মোট ইনপুটকৃত আয় রেকর্ড: <strong>${appData.incomes.length}টি</strong></p>
+                <p>• মোট ইনপুটকৃত খরচ রেকর্ড: <strong>${appData.expenses.length}টি</strong></p>
+                <p>• মোট registrados WiFi গ্রাহক: <strong>${appData.wifiUsers.length} জন</strong></p>
+                <p>• বর্তমান বকেয়া গ্রাহক: <strong>${dueUsers.length} জন</strong></p>
+            `;
+        }
+
+        // ব্যাকআপ ও রিস্টোর
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `smart_finance_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    appData = JSON.parse(e.target.result);
+                    saveData();
+                    alert('ডাটা সফলভাবে রিস্টোর হয়েছে!');
+                } catch(err) {
+                    alert('ভুল ব্যাকআপ ফাইল!');
+                }
+            };
+            if(event.target.files[0]) fileReader.readAsText(event.target.files[0]);
+        }
+
+        // PWA Install Prompt Logic
         let deferredPrompt;
         const installBtn = document.getElementById('installAppBtn');
 
@@ -107,17 +419,16 @@
 
         installBtn.addEventListener('click', () => {
             installBtn.classList.add('hidden');
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => {
-                deferredPrompt = null;
-            });
+            if(deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                });
+            }
         });
 
-        function switchTab(tabName) {
-            console.log("Switching to tab: " + tabName);
-        }
-        function exportData() { alert("ব্যাকআপ নেওয়া হচ্ছে..."); }
-        function importData(e) { alert("রিস্টোর করা হচ্ছে..."); }
+        // প্রথমবার লোড
+        renderAll();
     </script>
 </body>
 </html>
