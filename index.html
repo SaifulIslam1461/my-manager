@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Super Shop - WiFi & Personal Finance</title>
+    <title>My Super Shop - Professional WiFi & Financial Management System</title>
     <!-- Tailwind CSS CDN for Modern UI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .active-tab { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: bold; }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 pb-20">
@@ -18,17 +23,28 @@
     <header class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
         <div>
             <h1 class="text-xl font-bold"><i class="fa-solid fa-wifi mr-2"></i>My Super Shop</h1>
-            <p class="text-xs text-blue-200">WiFi & Personal Finance Manager</p>
+            <p class="text-xs text-blue-200">WiFi & Business Management System</p>
         </div>
-        <button onclick="clearData()" class="text-xs bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-white">Reset Data</button>
+        <div class="flex items-center space-x-2">
+            <button onclick="toggleModal('trash-modal')" class="text-xs bg-gray-700 hover:bg-gray-800 px-2.5 py-1.5 rounded text-white" title="Trash Recovery">
+                <i class="fa-solid fa-trash-can mr-1"></i> Trash
+            </button>
+            <button onclick="exportJSONBackup()" class="text-xs bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1.5 rounded text-white" title="Backup Data">
+                <i class="fa-solid fa-download"></i>
+            </button>
+            <button onclick="clearData()" class="text-xs bg-red-500 hover:bg-red-600 px-2.5 py-1.5 rounded text-white">Reset</button>
+        </div>
     </header>
 
-    <!-- Main Dynamic Content Area -->
+    <!-- Main Content Area -->
     <main class="p-4 max-w-4xl mx-auto">
 
         <!-- 1. DASHBOARD TAB -->
         <section id="tab-dashboard" class="space-y-4">
-            <h2 class="text-lg font-bold text-gray-700 mb-2">📊 Home Summary Dashboard</h2>
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-gray-700">📊 Business Overview Dashboard</h2>
+                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-semibold">Real-Time Sync</span>
+            </div>
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="bg-white p-4 rounded-xl shadow border-l-4 border-green-500">
@@ -40,7 +56,7 @@
                     <p class="text-xl font-bold text-red-600" id="dash-expense">৳ 0</p>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow border-l-4 border-blue-500">
-                    <p class="text-xs text-gray-500">নেট ব্যালেন্স</p>
+                    <p class="text-xs text-gray-500">নেট ব্যালেন্স (Balance)</p>
                     <p class="text-xl font-bold text-blue-600" id="dash-balance">৳ 0</p>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow border-l-4 border-orange-500">
@@ -49,30 +65,50 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
                 <div class="bg-white p-3 rounded-lg shadow text-center">
-                    <i class="fa-solid fa-users text-blue-500 text-2xl mb-1"></i>
+                    <i class="fa-solid fa-users text-blue-500 text-xl mb-1"></i>
                     <p class="text-xs text-gray-500">মোট WiFi কাস্টমার</p>
-                    <p class="text-lg font-bold" id="dash-cust-count">0</p>
+                    <p class="text-lg font-bold" id="dash-cust-count">0 (Active: 0)</p>
                 </div>
                 <div class="bg-white p-3 rounded-lg shadow text-center">
-                    <i class="fa-solid fa-hand-holding-dollar text-green-500 text-2xl mb-1"></i>
+                    <i class="fa-solid fa-hand-holding-dollar text-green-500 text-xl mb-1"></i>
                     <p class="text-xs text-gray-500">মোট পাওনা (Receivable)</p>
                     <p class="text-lg font-bold text-green-600" id="dash-receivable">৳ 0</p>
                 </div>
-                <div class="bg-white p-3 rounded-lg shadow text-center col-span-2 md:col-span-1">
-                    <i class="fa-solid fa-file-invoice-dollar text-purple-500 text-2xl mb-1"></i>
+                <div class="bg-white p-3 rounded-lg shadow text-center">
+                    <i class="fa-solid fa-file-invoice-dollar text-red-500 text-xl mb-1"></i>
                     <p class="text-xs text-gray-500">মোট দেনা (Payable)</p>
                     <p class="text-lg font-bold text-red-600" id="dash-payable">৳ 0</p>
                 </div>
+                <div class="bg-white p-3 rounded-lg shadow text-center">
+                    <i class="fa-solid fa-chart-line text-purple-500 text-xl mb-1"></i>
+                    <p class="text-xs text-gray-500">WiFi নিট লাভ (Profit)</p>
+                    <p class="text-lg font-bold text-purple-600" id="dash-wifi-profit">৳ 0</p>
+                </div>
+            </div>
+
+            <!-- Search & Filter Bar -->
+            <div class="bg-white p-3 rounded-xl shadow mt-4 flex flex-wrap gap-2 items-center">
+                <input type="text" id="global-search" oninput="renderAll()" placeholder="Search Name, Phone, Room..." class="border p-2 rounded text-sm flex-1">
+                <select id="filter-status" onchange="renderAll()" class="border p-2 rounded text-sm">
+                    <option value="All">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Due">Due</option>
+                    <option value="Suspended">Suspended</option>
+                </select>
             </div>
         </section>
 
         <!-- 2. WIFI CUSTOMERS TAB -->
         <section id="tab-wifi" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-lg font-bold text-gray-700">📶 WiFi Customers</h2>
-                <button onclick="toggleModal('customer-modal')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow hover:bg-blue-700">+ Add Customer</button>
+                <h2 class="text-lg font-bold text-gray-700">📶 WiFi Customer Management</h2>
+                <div class="space-x-1">
+                    <button onclick="toggleModal('recharge-modal')" class="bg-purple-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow hover:bg-purple-700">+ Recharge</button>
+                    <button onclick="toggleModal('investment-modal')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow hover:bg-indigo-700">+ Investment</button>
+                    <button onclick="toggleModal('customer-modal')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow hover:bg-blue-700">+ Add Customer</button>
+                </div>
             </div>
 
             <!-- Customer List -->
@@ -84,7 +120,7 @@
         <!-- 3. FINANCE TAB (Income/Expense) -->
         <section id="tab-finance" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-lg font-bold text-gray-700">💰 Income & Expenses</h2>
+                <h2 class="text-lg font-bold text-gray-700">💰 Personal Income & Expense Ledger</h2>
                 <div class="space-x-1">
                     <button onclick="openFinanceModal('Income')" class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow">+ Income</button>
                     <button onclick="openFinanceModal('Expense')" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow">+ Expense</button>
@@ -97,8 +133,9 @@
                         <tr>
                             <th class="p-3">তারিখ</th>
                             <th class="p-3">টাইপ</th>
-                            <th class="p-3">ক্যাটাগরি</th>
+                            <th class="p-3">ক্যাটাগরি/নোট</th>
                             <th class="p-3">পরিমাণ</th>
+                            <th class="p-3 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody id="finance-table-body">
@@ -111,8 +148,8 @@
         <!-- 4. DUES (Receivable/Payable) TAB -->
         <section id="tab-dues" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-lg font-bold text-gray-700">🤝 পাওনা ও দেনা (Dues)</h2>
-                <button onclick="toggleModal('due-modal')" class="bg-purple-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow">+ Add Entry</button>
+                <h2 class="text-lg font-bold text-gray-700">🤝 পাওনা ও দেনা (Advanced Ledger)</h2>
+                <button onclick="toggleModal('due-modal')" class="bg-purple-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow">+ Add Person/Entry</button>
             </div>
 
             <div id="dues-list" class="space-y-3">
@@ -123,7 +160,7 @@
     </main>
 
     <!-- Bottom Navigation Bar -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 text-xs text-gray-600 shadow-lg">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2 text-xs text-gray-600 shadow-lg z-40">
         <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center py-1 active-tab w-full">
             <i class="fa-solid fa-chart-pie text-lg"></i>
             <span>Dashboard</span>
@@ -142,17 +179,103 @@
         </button>
     </nav>
 
-    <!-- MODAL: ADD CUSTOMER -->
+    <!-- MODAL: ADD / EDIT CUSTOMER -->
     <div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-3">
-            <h3 class="font-bold text-lg">Add New WiFi Customer</h3>
-            <input id="c-name" type="text" placeholder="Customer Name" class="w-full border p-2 rounded text-sm">
-            <input id="c-phone" type="text" placeholder="Mobile / WhatsApp Number" class="w-full border p-2 rounded text-sm">
-            <input id="c-room" type="text" placeholder="Room Number" class="w-full border p-2 rounded text-sm">
-            <input id="c-bill" type="number" placeholder="Monthly Bill Amount (TK)" class="w-full border p-2 rounded text-sm">
+        <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto">
+            <h3 class="font-bold text-lg text-blue-600" id="cust-modal-title">Add Permanent WiFi Customer</h3>
+            <input id="c-id" type="hidden">
+            <input id="c-name" type="text" placeholder="Customer Name *" class="w-full border p-2 rounded text-sm">
+            <input id="c-phone" type="text" placeholder="Mobile Number *" class="w-full border p-2 rounded text-sm">
+            <input id="c-whatsapp" type="text" placeholder="WhatsApp Number" class="w-full border p-2 rounded text-sm">
+            <input id="c-room" type="text" placeholder="Room Number *" class="w-full border p-2 rounded text-sm">
+            <div class="grid grid-cols-2 gap-2">
+                <input id="c-device" type="text" placeholder="Device Name" class="border p-2 rounded text-sm">
+                <input id="c-dev-type" type="text" placeholder="Type (Mobile/Router)" class="border p-2 rounded text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <input id="c-bill" type="number" placeholder="Monthly Bill (TK) *" class="border p-2 rounded text-sm">
+                <input id="c-conn-date" type="date" class="border p-2 rounded text-sm">
+            </div>
+            <select id="c-billing-mode" class="w-full border p-2 rounded text-sm">
+                <option value="Fixed">Fixed Monthly Billing (1st of Month)</option>
+                <option value="Anniversary">Anniversary Billing (Connection Date)</option>
+            </select>
+            <textarea id="c-notes" placeholder="Notes / Description" class="w-full border p-2 rounded text-sm h-16"></textarea>
             <div class="flex justify-end space-x-2 pt-2">
                 <button onclick="toggleModal('customer-modal')" class="px-4 py-2 border rounded text-sm">Cancel</button>
-                <button onclick="saveCustomer()" class="px-4 py-2 bg-blue-600 text-white rounded text-sm">Save</button>
+                <button onclick="saveCustomer()" class="px-4 py-2 bg-blue-600 text-white rounded text-sm font-semibold">Save Customer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CUSTOMER PROFILE & LIFETIME TIMELINE -->
+    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-5 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto" id="printable-area">
+            <div class="flex justify-between items-start border-b pb-2">
+                <div>
+                    <h3 class="font-bold text-xl text-gray-800" id="p-name">Customer Name</h3>
+                    <p class="text-xs text-gray-500" id="p-details">Room: 101 | Mobile: 01700000000</p>
+                </div>
+                <button onclick="toggleModal('profile-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <!-- Due Breakdown Cards -->
+            <div class="grid grid-cols-3 gap-2 bg-blue-50 p-3 rounded-lg text-center text-xs">
+                <div>
+                    <p class="text-gray-500">Monthly Bill</p>
+                    <p class="font-bold text-sm text-blue-600" id="p-monthly-bill">৳ 0</p>
+                </div>
+                <div>
+                    <p class="text-gray-500">Total Paid</p>
+                    <p class="font-bold text-sm text-green-600" id="p-total-paid">৳ 0</p>
+                </div>
+                <div>
+                    <p class="text-gray-500">Current Due</p>
+                    <p class="font-bold text-sm text-red-600" id="p-total-due">৳ 0</p>
+                </div>
+            </div>
+
+            <!-- Customer Status & Quick Action Buttons -->
+            <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg text-xs">
+                <span>Status: <strong id="p-status" class="text-blue-600">Active</strong></span>
+                <div class="space-x-1">
+                    <button onclick="changeCustStatus('Active')" class="bg-green-600 text-white px-2 py-1 rounded">Active</button>
+                    <button onclick="changeCustStatus('Suspended')" class="bg-yellow-600 text-white px-2 py-1 rounded">Suspend</button>
+                    <button onclick="printStatement()" class="bg-gray-700 text-white px-2 py-1 rounded"><i class="fa-solid fa-print"></i> Statement</button>
+                </div>
+            </div>
+
+            <!-- Lifetime History Timeline -->
+            <div>
+                <h4 class="font-bold text-sm text-gray-700 mb-2"><i class="fa-solid fa-timeline text-blue-500 mr-1"></i> Lifetime Activity History</h4>
+                <div id="p-timeline" class="space-y-2 max-h-60 overflow-y-auto border p-2 rounded-lg bg-gray-50 text-xs">
+                    <!-- Timeline entries -->
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t">
+                <button onclick="toggleModal('profile-modal')" class="px-4 py-1.5 bg-gray-600 text-white rounded text-xs">Close Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PAYMENT RECEIVE -->
+    <div id="pay-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-5 w-full max-w-sm space-y-3">
+            <h3 class="font-bold text-lg text-green-600">Receive WiFi Bill Payment</h3>
+            <input id="pay-cust-id" type="hidden">
+            <input id="pay-amount" type="number" placeholder="Payment Amount (TK)" class="w-full border p-2 rounded text-sm">
+            <input id="pay-date" type="date" class="w-full border p-2 rounded text-sm">
+            <select id="pay-method" class="w-full border p-2 rounded text-sm">
+                <option value="Cash">Cash Payment</option>
+                <option value="bKash">bKash Entry</option>
+                <option value="Nagad">Nagad Entry</option>
+                <option value="Rocket">Rocket Entry</option>
+            </select>
+            <input id="pay-note" type="text" placeholder="Transaction Note / Receipt No." class="w-full border p-2 rounded text-sm">
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="toggleModal('pay-modal')" class="px-4 py-2 border rounded text-sm">Cancel</button>
+                <button onclick="submitPayment()" class="px-4 py-2 bg-green-600 text-white rounded text-sm font-semibold">Confirm Payment</button>
             </div>
         </div>
     </div>
@@ -160,61 +283,126 @@
     <!-- MODAL: ADD FINANCE -->
     <div id="finance-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-3">
-            <h3 class="font-bold text-lg" id="finance-modal-title">Add Income</h3>
+            <h3 class="font-bold text-lg" id="finance-modal-title">Add Income Entry</h3>
+            <input id="f-id" type="hidden">
             <input id="f-type" type="hidden" value="Income">
-            <input id="f-category" type="text" placeholder="Category (e.g. WiFi, Food, Salary)" class="w-full border p-2 rounded text-sm">
+            <input id="f-date" type="date" class="w-full border p-2 rounded text-sm">
+            <input id="f-category" type="text" placeholder="Category (e.g., Tuition, Salary, Business)" class="w-full border p-2 rounded text-sm">
             <input id="f-amount" type="number" placeholder="Amount (TK)" class="w-full border p-2 rounded text-sm">
             <input id="f-note" type="text" placeholder="Note / Description" class="w-full border p-2 rounded text-sm">
             <div class="flex justify-end space-x-2 pt-2">
                 <button onclick="toggleModal('finance-modal')" class="px-4 py-2 border rounded text-sm">Cancel</button>
-                <button onclick="saveFinance()" class="px-4 py-2 bg-green-600 text-white rounded text-sm">Save Entry</button>
+                <button onclick="saveFinance()" class="px-4 py-2 bg-green-600 text-white rounded text-sm font-semibold">Save Entry</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: ADD DUE -->
+    <!-- MODAL: RECHARGE & INVESTMENT -->
+    <div id="recharge-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-3">
+            <h3 class="font-bold text-lg text-purple-600">WiFi Internet Recharge Entry</h3>
+            <input id="r-date" type="date" class="w-full border p-2 rounded text-sm">
+            <input id="r-provider" type="text" placeholder="Provider Name (e.g. Link3, AmberIT)" class="w-full border p-2 rounded text-sm">
+            <input id="r-package" type="text" placeholder="Package Details (e.g. 50 Mbps)" class="w-full border p-2 rounded text-sm">
+            <input id="r-amount" type="number" placeholder="Recharge Amount (TK)" class="w-full border p-2 rounded text-sm">
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="toggleModal('recharge-modal')" class="px-4 py-2 border rounded text-sm">Cancel</button>
+                <button onclick="saveRecharge()" class="px-4 py-2 bg-purple-600 text-white rounded text-sm font-semibold">Save Recharge</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="investment-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-3">
+            <h3 class="font-bold text-lg text-indigo-600">WiFi Investment Expense</h3>
+            <input id="i-date" type="date" class="w-full border p-2 rounded text-sm">
+            <select id="i-category" class="w-full border p-2 rounded text-sm">
+                <option value="Router Purchase">Router Purchase</option>
+                <option value="Cable Cost">Cable Cost</option>
+                <option value="Switch Cost">Switch Cost</option>
+                <option value="Installation Cost">Installation Cost</option>
+                <option value="Maintenance Cost">Maintenance Cost</option>
+            </select>
+            <input id="i-amount" type="number" placeholder="Investment Amount (TK)" class="w-full border p-2 rounded text-sm">
+            <input id="i-note" type="text" placeholder="Description / Note" class="w-full border p-2 rounded text-sm">
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="toggleModal('investment-modal')" class="px-4 py-2 border rounded text-sm">Cancel</button>
+                <button onclick="saveInvestment()" class="px-4 py-2 bg-indigo-600 text-white rounded text-sm font-semibold">Save Investment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DUES (LEDGER) -->
     <div id="due-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-3">
-            <h3 class="font-bold text-lg">Add Due / Receivable / Payable</h3>
+            <h3 class="font-bold text-lg text-purple-600">Add Ledger Person / Entry</h3>
             <select id="d-type" class="w-full border p-2 rounded text-sm">
                 <option value="Receivable">পাবো (Receivable)</option>
                 <option value="Payable">দেবো (Payable)</option>
             </select>
-            <input id="d-name" type="text" placeholder="Person Name" class="w-full border p-2 rounded text-sm">
+            <input id="d-name" type="text" placeholder="Person Name *" class="w-full border p-2 rounded text-sm">
             <input id="d-phone" type="text" placeholder="Mobile / WhatsApp" class="w-full border p-2 rounded text-sm">
-            <input id="d-amount" type="number" placeholder="Amount (TK)" class="w-full border p-2 rounded text-sm">
+            <input id="d-amount" type="number" placeholder="Amount (TK) *" class="w-full border p-2 rounded text-sm">
+            <textarea id="d-desc" placeholder="Address / Description" class="w-full border p-2 rounded text-sm h-16"></textarea>
             <div class="flex justify-end space-x-2 pt-2">
                 <button onclick="toggleModal('due-modal')" class="px-4 py-2 border rounded text-sm">Cancel</button>
-                <button onclick="saveDue()" class="px-4 py-2 bg-purple-600 text-white rounded text-sm">Save Entry</button>
+                <button onclick="saveDue()" class="px-4 py-2 bg-purple-600 text-white rounded text-sm font-semibold">Save Ledger</button>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Logic & LocalStorage Data Engine -->
+    <!-- MODAL: TRASH BIN RECOVERY -->
+    <div id="trash-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-5 w-full max-w-md space-y-3 max-h-[80vh] overflow-y-auto">
+            <h3 class="font-bold text-lg text-gray-700"><i class="fa-solid fa-trash-can text-red-500 mr-2"></i>Trash Bin (Restore Deleted Entries)</h3>
+            <div id="trash-list" class="space-y-2 text-xs">
+                <!-- Trash entries -->
+            </div>
+            <div class="flex justify-end pt-2 border-t">
+                <button onclick="toggleModal('trash-modal')" class="px-4 py-1.5 border rounded text-xs">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Data Engine & Upgrade Script -->
     <script>
-        // Database Initialization
+        // Database Initialization with Backward Compatibility
         let db = {
             customers: JSON.parse(localStorage.getItem('db_customers')) || [],
             finances: JSON.parse(localStorage.getItem('db_finances')) || [],
-            dues: JSON.parse(localStorage.getItem('db_dues')) || []
+            dues: JSON.parse(localStorage.getItem('db_dues')) || [],
+            recharges: JSON.parse(localStorage.getItem('db_recharges')) || [],
+            investments: JSON.parse(localStorage.getItem('db_investments')) || [],
+            history: JSON.parse(localStorage.getItem('db_history')) || [],
+            trash: JSON.parse(localStorage.getItem('db_trash')) || []
         };
 
         function saveData() {
             localStorage.setItem('db_customers', JSON.stringify(db.customers));
             localStorage.setItem('db_finances', JSON.stringify(db.finances));
             localStorage.setItem('db_dues', JSON.stringify(db.dues));
+            localStorage.setItem('db_recharges', JSON.stringify(db.recharges));
+            localStorage.setItem('db_investments', JSON.stringify(db.investments));
+            localStorage.setItem('db_history', JSON.stringify(db.history));
+            localStorage.setItem('db_trash', JSON.stringify(db.trash));
             renderAll();
         }
 
         function clearData() {
-            if(confirm("আপনি কি সমস্ত ডাটা মুছে ফেলতে চান?")) {
+            if(confirm("আপনি কি সমস্ত ডাটা রিসেট করতে চান? আপনার তৈরি ডাটা মুছে যাবে!")) {
                 localStorage.clear();
-                db = { customers: [], finances: [], dues: [] };
-                renderAll();
+                location.reload();
             }
         }
 
-        // Navigation Switcher
+        function exportJSONBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `MySuperShop_Backup_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchorElem.click();
+        }
+
         function switchTab(tabName) {
             ['dashboard', 'wifi', 'finance', 'dues'].forEach(tab => {
                 document.getElementById('tab-' + tab).classList.add('hidden');
@@ -228,67 +416,232 @@
             document.getElementById(modalId).classList.toggle('hidden');
         }
 
-        // --- WiFi Customer Functions ---
+        // --- WiFi Customer Management Engine ---
         function saveCustomer() {
+            const id = document.getElementById('c-id').value;
             const name = document.getElementById('c-name').value;
             const phone = document.getElementById('c-phone').value;
+            const whatsapp = document.getElementById('c-whatsapp').value || phone;
             const room = document.getElementById('c-room').value;
+            const device = document.getElementById('c-device').value;
+            const devType = document.getElementById('c-dev-type').value;
             const bill = parseFloat(document.getElementById('c-bill').value) || 0;
+            const connDate = document.getElementById('c-conn-date').value || new Date().toISOString().slice(0,10);
+            const billingMode = document.getElementById('c-billing-mode').value;
+            const notes = document.getElementById('c-notes').value;
 
-            if(!name || !phone) return alert("নাম এবং মোবাইল নম্বর দেওয়া আবশ্যক!");
+            if(!name || !phone || !room || !bill) return alert("নাম, ফোন, রুম নম্বর এবং বিলের পরিমাণ দেওয়া বাধ্যতামূলক!");
 
-            db.customers.push({ id: Date.now(), name, phone, room, bill, due: bill });
+            if(id) {
+                // Update Existing Customer
+                let c = db.customers.find(item => item.id == id);
+                if(c) {
+                    c.name = name; c.phone = phone; c.whatsapp = whatsapp; c.room = room;
+                    c.device = device; c.devType = devType; c.bill = bill; c.connDate = connDate;
+                    c.billingMode = billingMode; c.notes = notes;
+                }
+            } else {
+                // New Permanent Customer
+                const newId = Date.now();
+                const newCust = {
+                    id: newId, name, phone, whatsapp, room, device, devType,
+                    bill, due: bill, totalPaid: 0, connDate, billingMode, notes,
+                    status: 'Active', created: new Date().toISOString().slice(0,10)
+                };
+                db.customers.push(newCust);
+
+                // Add Timeline History
+                db.history.push({
+                    id: Date.now(),
+                    custId: newId,
+                    date: connDate,
+                    action: 'WiFi Connection Started',
+                    details: `Connected with Monthly Bill ৳${bill}`
+                });
+            }
+
+            // Reset Form Fields
+            document.getElementById('c-id').value = '';
             document.getElementById('c-name').value = '';
             document.getElementById('c-phone').value = '';
+            document.getElementById('c-whatsapp').value = '';
             document.getElementById('c-room').value = '';
             document.getElementById('c-bill').value = '';
-            
             toggleModal('customer-modal');
             saveData();
         }
 
+        function openEditCustomer(id) {
+            let c = db.customers.find(item => item.id == id);
+            if(!c) return;
+            document.getElementById('c-id').value = c.id;
+            document.getElementById('c-name').value = c.name;
+            document.getElementById('c-phone').value = c.phone;
+            document.getElementById('c-whatsapp').value = c.whatsapp || c.phone;
+            document.getElementById('c-room').value = c.room;
+            document.getElementById('c-device').value = c.device || '';
+            document.getElementById('c-dev-type').value = c.devType || '';
+            document.getElementById('c-bill').value = c.bill;
+            document.getElementById('c-conn-date').value = c.connDate || '';
+            document.getElementById('c-notes').value = c.notes || '';
+            document.getElementById('cust-modal-title').innerText = "Edit Customer Profile";
+            toggleModal('customer-modal');
+        }
+
+        let currentProfileCustId = null;
+        function openCustomerProfile(id) {
+            let c = db.customers.find(item => item.id == id);
+            if(!c) return;
+            currentProfileCustId = id;
+
+            document.getElementById('p-name').innerText = c.name;
+            document.getElementById('p-details').innerText = `Room: ${c.room} | Mobile: ${c.phone} | Connection: ${c.connDate}`;
+            document.getElementById('p-monthly-bill').innerText = '৳ ' + c.bill;
+            document.getElementById('p-total-paid').innerText = '৳ ' + (c.totalPaid || 0);
+            document.getElementById('p-total-due').innerText = '৳ ' + c.due;
+            document.getElementById('p-status').innerText = c.status;
+
+            // Load Timeline
+            const timelineBox = document.getElementById('p-timeline');
+            timelineBox.innerHTML = '';
+            let custHistory = db.history.filter(h => h.custId == id).sort((a,b) => b.id - a.id);
+            if(custHistory.length === 0) {
+                timelineBox.innerHTML = '<p class="text-gray-400">কোনো হিস্ট্রি রেকর্ডেড নেই</p>';
+            } else {
+                custHistory.forEach(h => {
+                    timelineBox.innerHTML += `
+                        <div class="border-b pb-1">
+                            <span class="font-bold text-blue-600">${h.date}</span> - <strong>${h.action}</strong>
+                            <p class="text-gray-500">${h.details}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            toggleModal('profile-modal');
+        }
+
+        function openPayModal(custId) {
+            let c = db.customers.find(item => item.id == custId);
+            if(!c) return;
+            document.getElementById('pay-cust-id').value = custId;
+            document.getElementById('pay-amount').value = c.due;
+            document.getElementById('pay-date').value = new Date().toISOString().slice(0,10);
+            toggleModal('pay-modal');
+        }
+
+        function submitPayment() {
+            const custId = document.getElementById('pay-cust-id').value;
+            const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
+            const date = document.getElementById('pay-date').value || new Date().toISOString().slice(0,10);
+            const method = document.getElementById('pay-method').value;
+            const note = document.getElementById('pay-note').value;
+
+            let c = db.customers.find(item => item.id == custId);
+            if(c && amount > 0) {
+                c.due = Math.max(0, c.due - amount);
+                c.totalPaid = (c.totalPaid || 0) + amount;
+
+                // Add to Global Income
+                db.finances.push({
+                    id: Date.now(),
+                    date,
+                    type: 'Income',
+                    category: 'WiFi Bill Collection',
+                    amount,
+                    note: `${c.name} (Room ${c.room}) - Method: ${method} ${note}`
+                });
+
+                // Add to Timeline History
+                db.history.push({
+                    id: Date.now(),
+                    custId: c.id,
+                    date,
+                    action: 'Bill Payment Received',
+                    details: `Amount: ৳${amount} (${method}). Current Due: ৳${c.due}`
+                });
+
+                toggleModal('pay-modal');
+                saveData();
+            }
+        }
+
         function sendWhatsApp(phone, name, room, due) {
-            const msg = `আসসালামু আলাইকুম ${name} ভাই, আপনার Room No: ${room}-এর WiFi বিল পরিশোধের সময় হয়েছে। বর্তমান বকেয়া: ${due} টাকা। অনুরোধক্রমে: My Super Shop।`;
+            const msg = `আসসালামু আলাইকুম ${name} ভাই,\nআপনার Room No: ${room}-এর WiFi বিল পরিশোধের সময় হয়েছে।\nবর্তমান বকেয়া: ৳${due}।\nঅনুগ্রহ করে দ্রুত বিল পরিশোধ করুন।\nধন্যবাদ - My Super Shop`;
             const url = `https://wa.me/88${phone}?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
         }
 
-        function clearCustomerDue(id) {
-            const cust = db.customers.find(c => c.id === id);
-            if(cust) {
-                db.finances.push({
-                    id: Date.now(),
-                    date: new Date().toLocaleDateString('bn-BD'),
-                    type: 'Income',
-                    category: 'WiFi Bill',
-                    amount: cust.due,
-                    note: `${cust.name} (Room ${cust.room})`
-                });
-                cust.due = 0;
+        function changeCustStatus(status) {
+            if(!currentProfileCustId) return;
+            let c = db.customers.find(item => item.id == currentProfileCustId);
+            if(c) {
+                c.status = status;
                 saveData();
+                openCustomerProfile(currentProfileCustId);
             }
+        }
+
+        function printStatement() {
+            window.print();
+        }
+
+        // --- Recharge & Investment Functions ---
+        function saveRecharge() {
+            const date = document.getElementById('r-date').value || new Date().toISOString().slice(0,10);
+            const provider = document.getElementById('r-provider').value;
+            const packageDetails = document.getElementById('r-package').value;
+            const amount = parseFloat(document.getElementById('r-amount').value) || 0;
+
+            if(!amount) return alert("রিচার্জের পরিমাণ লিখুন!");
+
+            db.recharges.push({ id: Date.now(), date, provider, packageDetails, amount });
+            db.finances.push({
+                id: Date.now(), date, type: 'Expense',
+                category: 'WiFi Line Recharge', amount,
+                note: `Provider: ${provider} (${packageDetails})`
+            });
+
+            toggleModal('recharge-modal');
+            saveData();
+        }
+
+        function saveInvestment() {
+            const date = document.getElementById('i-date').value || new Date().toISOString().slice(0,10);
+            const category = document.getElementById('i-category').value;
+            const amount = parseFloat(document.getElementById('i-amount').value) || 0;
+            const note = document.getElementById('i-note').value;
+
+            if(!amount) return alert("ইনভেস্টমেন্টের পরিমাণ লিখুন!");
+
+            db.investments.push({ id: Date.now(), date, category, amount, note });
+            db.finances.push({
+                id: Date.now(), date, type: 'Expense',
+                category: `WiFi Capital: ${category}`, amount, note
+            });
+
+            toggleModal('investment-modal');
+            saveData();
         }
 
         // --- Personal Finance Functions ---
         function openFinanceModal(type) {
             document.getElementById('f-type').value = type;
-            document.getElementById('finance-modal-title').innerText = 'Add ' + type;
+            document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+            document.getElementById('finance-modal-title').innerText = 'Add ' + type + ' Entry';
             toggleModal('finance-modal');
         }
 
         function saveFinance() {
             const type = document.getElementById('f-type').value;
+            const date = document.getElementById('f-date').value || new Date().toISOString().slice(0,10);
             const category = document.getElementById('f-category').value;
             const amount = parseFloat(document.getElementById('f-amount').value) || 0;
             const note = document.getElementById('f-note').value;
 
-            if(!amount) return alert("পরিমাণ লিখুন!");
+            if(!amount) return alert("টাকার পরিমাণ লিখুন!");
 
-            db.finances.push({
-                id: Date.now(),
-                date: new Date().toLocaleDateString('bn-BD'),
-                type, category, amount, note
-            });
+            db.finances.push({ id: Date.now(), date, type, category, amount, note });
 
             document.getElementById('f-category').value = '';
             document.getElementById('f-amount').value = '';
@@ -297,16 +650,28 @@
             saveData();
         }
 
-        // --- Dues Functions ---
+        function deleteFinance(id) {
+            if(confirm("আপনি কি এই এন্ট্রিটি ট্র্যাশ বিনে সরাতে চান?")) {
+                let index = db.finances.findIndex(f => f.id == id);
+                if(index > -1) {
+                    let deleted = db.finances.splice(index, 1)[0];
+                    db.trash.push({ ...deleted, trashType: 'Finance', deletedAt: new Date().toLocaleDateString('bn-BD') });
+                    saveData();
+                }
+            }
+        }
+
+        // --- Dues & Ledger Functions ---
         function saveDue() {
             const type = document.getElementById('d-type').value;
             const name = document.getElementById('d-name').value;
             const phone = document.getElementById('d-phone').value;
             const amount = parseFloat(document.getElementById('d-amount').value) || 0;
+            const desc = document.getElementById('d-desc').value;
 
-            if(!name || !amount) return alert("নাম এবং টাকা লিখুন!");
+            if(!name || !amount) return alert("নাম ও টাকার পরিমাণ বাধ্যতামূলক!");
 
-            db.dues.push({ id: Date.now(), type, name, phone, amount });
+            db.dues.push({ id: Date.now(), type, name, phone, amount, desc });
             document.getElementById('d-name').value = '';
             document.getElementById('d-phone').value = '';
             document.getElementById('d-amount').value = '';
@@ -314,73 +679,133 @@
             saveData();
         }
 
-        // --- Render UI ---
+        function deleteDue(id) {
+            if(confirm("আপনি কি এটি ট্র্যাশ বিনে স্থানান্তর করতে চান?")) {
+                let index = db.dues.findIndex(d => d.id == id);
+                if(index > -1) {
+                    let deleted = db.dues.splice(index, 1)[0];
+                    db.trash.push({ ...deleted, trashType: 'Ledger', deletedAt: new Date().toLocaleDateString('bn-BD') });
+                    saveData();
+                }
+            }
+        }
+
+        // --- Render UI Data & Dashboards ---
         function renderAll() {
-            // Dashboard Calc
+            const searchQuery = (document.getElementById('global-search') ? document.getElementById('global-search').value : '').toLowerCase();
+            const filterStatus = document.getElementById('filter-status') ? document.getElementById('filter-status').value : 'All';
+
+            // Calculations
             let totalIncome = db.finances.filter(f => f.type === 'Income').reduce((sum, f) => sum + f.amount, 0);
             let totalExpense = db.finances.filter(f => f.type === 'Expense').reduce((sum, f) => sum + f.amount, 0);
             let wifiDue = db.customers.reduce((sum, c) => sum + c.due, 0);
             let totalReceivable = db.dues.filter(d => d.type === 'Receivable').reduce((sum, d) => sum + d.amount, 0);
             let totalPayable = db.dues.filter(d => d.type === 'Payable').reduce((sum, d) => sum + d.amount, 0);
 
+            let wifiIncomes = db.finances.filter(f => f.type === 'Income' && f.category.includes('WiFi')).reduce((sum, f) => sum + f.amount, 0);
+            let wifiExpenses = db.finances.filter(f => f.type === 'Expense' && f.category.includes('WiFi')).reduce((sum, f) => sum + f.amount, 0);
+            let wifiProfit = wifiIncomes - wifiExpenses;
+
+            // Render Dashboard Summary
             document.getElementById('dash-income').innerText = '৳ ' + totalIncome;
             document.getElementById('dash-expense').innerText = '৳ ' + totalExpense;
             document.getElementById('dash-balance').innerText = '৳ ' + (totalIncome - totalExpense);
             document.getElementById('dash-wifi-due').innerText = '৳ ' + wifiDue;
-            document.getElementById('dash-cust-count').innerText = db.customers.length;
+            
+            let activeCustCount = db.customers.filter(c => c.status === 'Active').length;
+            document.getElementById('dash-cust-count').innerText = `${db.customers.length} (Active: ${activeCustCount})`;
             document.getElementById('dash-receivable').innerText = '৳ ' + totalReceivable;
             document.getElementById('dash-payable').innerText = '৳ ' + totalPayable;
+            document.getElementById('dash-wifi-profit').innerText = '৳ ' + wifiProfit;
 
-            // Render Customers
+            // Render Customer Cards
             const cList = document.getElementById('customer-list');
-            cList.innerHTML = db.customers.length === 0 ? '<p class="text-gray-400 text-center py-4">কোনো কাস্টমার নেই</p>' : '';
-            db.customers.forEach(c => {
+            cList.innerHTML = db.customers.length === 0 ? '<p class="text-gray-400 text-center py-4">কোনো কাস্টমার রেজিস্টার্ড নেই</p>' : '';
+            
+            db.customers.filter(c => {
+                let matchesSearch = c.name.toLowerCase().includes(searchQuery) || c.phone.includes(searchQuery) || c.room.toLowerCase().includes(searchQuery);
+                let matchesFilter = filterStatus === 'All' || (filterStatus === 'Due' ? c.due > 0 : c.status === filterStatus);
+                return matchesSearch && matchesFilter;
+            }).forEach(c => {
                 cList.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow flex justify-between items-center">
+                    <div class="bg-white p-4 rounded-xl shadow flex justify-between items-center border-l-4 ${c.due > 0 ? 'border-red-500' : 'border-green-500'}">
                         <div>
-                            <h4 class="font-bold text-gray-800">${c.name} <span class="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">Room: ${c.room}</span></h4>
-                            <p class="text-xs text-gray-500">📱 ${c.phone} | Bill: ৳${c.bill}</p>
-                            <p class="text-xs font-semibold ${c.due > 0 ? 'text-red-500' : 'text-green-600'}">Due: ৳${c.due}</p>
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-bold text-gray-800 hover:text-blue-600 cursor-pointer text-base" onclick="openCustomerProfile(${c.id})">${c.name}</h4>
+                                <span class="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-semibold">Room: ${c.room}</span>
+                                <span class="text-xs px-2 py-0.5 rounded ${c.status==='Active'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${c.status}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">📱 ${c.phone} | Bill: ৳${c.bill} / mo</p>
+                            <p class="text-xs font-semibold ${c.due > 0 ? 'text-red-500' : 'text-green-600'} mt-0.5">Current Due: ৳${c.due}</p>
                         </div>
-                        <div class="flex space-x-2">
-                            <button onclick="sendWhatsApp('${c.phone}', '${c.name}', '${c.room}', '${c.due}')" class="bg-green-500 text-white p-2 rounded-lg text-xs"><i class="fa-brands fa-whatsapp text-sm"></i></button>
-                            ${c.due > 0 ? `<button onclick="clearCustomerDue(${c.id})" class="bg-blue-600 text-white px-2 py-1 rounded text-xs">Pay</button>` : ''}
+                        <div class="flex space-x-1.5 items-center">
+                            <button onclick="sendWhatsApp('${c.whatsapp || c.phone}', '${c.name}', '${c.room}', '${c.due}')" class="bg-green-500 text-white p-2 rounded-lg text-xs" title="WhatsApp Reminder"><i class="fa-brands fa-whatsapp text-sm"></i></button>
+                            <button onclick="openPayModal(${c.id})" class="bg-green-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold">Pay</button>
+                            <button onclick="openEditCustomer(${c.id})" class="bg-gray-200 text-gray-700 px-2 py-1.5 rounded-lg text-xs" title="Edit Profile"><i class="fa-solid fa-pen"></i></button>
                         </div>
                     </div>
                 `;
             });
 
-            // Render Finances
+            // Render Finance Ledger
             const fBody = document.getElementById('finance-table-body');
-            fBody.innerHTML = db.finances.length === 0 ? '<tr><td colspan="4" class="text-center p-4 text-gray-400">কোনো হিসেব নেই</td></tr>' : '';
+            fBody.innerHTML = db.finances.length === 0 ? '<tr><td colspan="5" class="text-center p-4 text-gray-400">কোনো আর্থিক এন্ট্রি নেই</td></tr>' : '';
             db.finances.slice().reverse().forEach(f => {
                 fBody.innerHTML += `
                     <tr class="border-b">
-                        <td class="p-3 text-xs">${f.date}</td>
+                        <td class="p-3 text-xs font-medium">${f.date}</td>
                         <td class="p-3"><span class="text-xs px-2 py-0.5 rounded ${f.type === 'Income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${f.type}</span></td>
-                        <td class="p-3 text-sm font-medium">${f.category} <p class="text-xs text-gray-400">${f.note}</p></td>
-                        <td class="p-3 font-bold ${f.type === 'Income' ? 'text-green-600' : 'text-red-600'}">৳${f.amount}</td>
+                        <td class="p-3 text-sm font-medium">${f.category} <p class="text-xs text-gray-400">${f.note || ''}</p></td>
+                        <td class="p-3 font-bold ${f.type === 'Income' ? 'text-green-600' : 'text-red-600'}">৳ ${f.amount}</td>
+                        <td class="p-3 text-right">
+                            <button onclick="deleteFinance(${f.id})" class="text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
                     </tr>
                 `;
             });
 
-            // Render Dues
+            // Render Dues List
             const dList = document.getElementById('dues-list');
-            dList.innerHTML = db.dues.length === 0 ? '<p class="text-gray-400 text-center py-4">কোনো পাওনা-দেনা নেই</p>' : '';
+            dList.innerHTML = db.dues.length === 0 ? '<p class="text-gray-400 text-center py-4">কোনো পাওনা-দেনা রেকর্ড নেই</p>' : '';
             db.dues.forEach(d => {
                 dList.innerHTML += `
                     <div class="bg-white p-3 rounded-lg shadow flex justify-between items-center border-l-4 ${d.type === 'Receivable' ? 'border-green-500' : 'border-red-500'}">
                         <div>
-                            <h4 class="font-bold text-sm">${d.name} (${d.phone})</h4>
-                            <p class="text-xs text-gray-500">${d.type === 'Receivable' ? 'পাবো (Receivable)' : 'দেবো (Payable)'}</p>
+                            <h4 class="font-bold text-sm text-gray-800">${d.name} <span class="text-xs text-gray-500">(${d.phone || 'N/A'})</span></h4>
+                            <p class="text-xs text-gray-500">${d.type === 'Receivable' ? 'পাবো (Receivable)' : 'দেবো (Payable)'} - ${d.desc || ''}</p>
                         </div>
-                        <span class="font-bold ${d.type === 'Receivable' ? 'text-green-600' : 'text-red-600'}">৳ ${d.amount}</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold ${d.type === 'Receivable' ? 'text-green-600' : 'text-red-600'}">৳ ${d.amount}</span>
+                            <button onclick="deleteDue(${d.id})" class="text-red-400 hover:text-red-600 text-xs"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Render Trash Bin List
+            const tList = document.getElementById('trash-list');
+            tList.innerHTML = db.trash.length === 0 ? '<p class="text-gray-400 text-center">ট্র্যাশ বিন খালি</p>' : '';
+            db.trash.forEach((t, index) => {
+                tList.innerHTML += `
+                    <div class="bg-gray-100 p-2 rounded flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold">${t.category || t.name} (৳${t.amount})</p>
+                            <p class="text-gray-400">Deleted: ${t.deletedAt}</p>
+                        </div>
+                        <button onclick="restoreTrash(${index})" class="bg-blue-600 text-white px-2 py-1 rounded text-xs">Restore</button>
                     </div>
                 `;
             });
         }
 
-        // First Render
+        function restoreTrash(index) {
+            let item = db.trash.splice(index, 1)[0];
+            if(item.trashType === 'Finance') db.finances.push(item);
+            if(item.trashType === 'Ledger') db.dues.push(item);
+            saveData();
+        }
+
+        // Initial System Render
         renderAll();
     </script>
 </body>
