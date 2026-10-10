@@ -32,19 +32,17 @@
         </div>
     </div>
 
-    <!-- Header Navigation (Clean & Minimalist) -->
-    <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 shadow-lg sticky top-0 z-50 flex justify-between items-center">
-        <div>
-            <h1 class="text-xl font-extrabold tracking-wide"><i class="fa-solid fa-wifi mr-2"></i>মাই সুপার শপ</h1>
-            <p class="text-xs text-blue-100 opacity-90">ওয়াইফাই ও ব্যবসায়িক হিসাব ব্যবস্থাপনা</p>
-        </div>
-        <div class="flex items-center space-x-2">
-            <button onclick="toggleModal('trash-modal')" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl text-white backdrop-blur-md transition flex items-center gap-1" title="ট্র্যাশ বিন">
-                <i class="fa-solid fa-trash-can"></i> ট্র্যাশ
-            </button>
-            <button onclick="exportBackupJSON()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-2 rounded-xl text-white backdrop-blur-md transition" title="ব্যাকআপ">
-                <i class="fa-solid fa-download"></i>
-            </button>
+    <!-- Header Navigation with Beautiful Background Image & Overlay -->
+    <header class="relative bg-cover bg-center text-white p-6 shadow-lg sticky top-0 z-50 overflow-hidden" 
+            style="background-image: url('https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=1000&auto=format&fit=crop');">
+        <!-- Dark Overlay for better text readability -->
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-indigo-900/80 to-purple-900/85 backdrop-blur-[2px]"></div>
+        
+        <div class="relative z-10">
+            <h1 class="text-2xl font-extrabold tracking-wide flex items-center gap-2 drop-shadow-md">
+                <i class="fa-solid fa-wifi text-blue-400"></i>মাই সুপার শপ
+            </h1>
+            <p class="text-xs text-blue-100 opacity-90 mt-1 drop-shadow">ওয়াইফাই ও ব্যবসায়িক হিসাব ব্যবস্থাপনা</p>
         </div>
     </header>
 
@@ -55,7 +53,6 @@
         <section id="tab-dashboard" class="space-y-5">
             <div class="flex justify-between items-center px-1">
                 <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">📊 ড্যাশবোর্ড ও ওভারভিউ</h2>
-                <span class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-semibold border border-blue-100">রিয়েল-টাইম সিঙ্ক</span>
             </div>
 
             <!-- Financial Cards -->
@@ -190,7 +187,7 @@
 
     </main>
 
-    <!-- Bottom Navigation Bar (Modern Floating Style) -->
+    <!-- Bottom Navigation Bar -->
     <nav class="fixed bottom-3 left-4 right-4 bg-white/90 backdrop-blur-md border border-gray-100 flex justify-around p-2 text-xs text-gray-500 shadow-xl rounded-2xl z-40 max-w-md mx-auto">
         <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center py-1.5 active-tab w-full rounded-xl transition">
             <i class="fa-solid fa-chart-pie text-base mb-0.5"></i>
@@ -239,7 +236,7 @@
         </div>
     </div>
 
-    <!-- Additional Modals (Profile, Pay, Finance, etc.) -->
+    <!-- Profile Modal -->
     <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl" id="printable-area">
             <div class="flex justify-between items-start border-b border-gray-100 pb-3">
@@ -281,6 +278,7 @@
         </div>
     </div>
 
+    <!-- Pay Modal -->
     <div id="pay-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-3 shadow-2xl">
             <h3 class="font-bold text-lg text-emerald-600">WiFi বিল গ্রহণ করুন</h3>
@@ -300,6 +298,7 @@
         </div>
     </div>
 
+    <!-- Finance Modal -->
     <div id="finance-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-md space-y-3 shadow-2xl">
             <h3 class="font-bold text-lg text-gray-800" id="finance-modal-title">আয় এন্ট্রি করুন</h3>
@@ -315,6 +314,7 @@
         </div>
     </div>
 
+    <!-- Recharge Modal -->
     <div id="recharge-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-md space-y-3 shadow-2xl">
             <h3 class="font-bold text-lg text-purple-600">WiFi ইন্টারনেট রিচার্জ এন্ট্রি</h3>
@@ -329,6 +329,7 @@
         </div>
     </div>
 
+    <!-- Investment Modal -->
     <div id="investment-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-md space-y-3 shadow-2xl">
             <h3 class="font-bold text-lg text-indigo-600">WiFi মূলধন / ইনভেস্টমেন্ট এন্ট্রি</h3>
@@ -347,6 +348,7 @@
         </div>
     </div>
 
+    <!-- Due Modal -->
     <div id="due-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-md space-y-3 shadow-2xl">
             <h3 class="font-bold text-lg text-purple-600">পাওনা-দেনা খাতা এন্ট্রি</h3>
@@ -361,16 +363,6 @@
             <div class="flex justify-end space-x-2 pt-2">
                 <button onclick="toggleModal('due-modal')" class="px-4 py-2 border border-gray-200 rounded-xl text-sm">বাতিল</button>
                 <button onclick="saveDue()" class="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-semibold shadow-md">সেভ</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="trash-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-md space-y-3 max-h-[80vh] overflow-y-auto shadow-2xl">
-            <h3 class="font-bold text-lg text-gray-800"><i class="fa-solid fa-trash-can text-rose-500 mr-2"></i>ট্র্যাশ বিন</h3>
-            <div id="trash-list" class="space-y-2 text-xs"></div>
-            <div class="flex justify-end pt-2 border-t border-gray-100">
-                <button onclick="toggleModal('trash-modal')" class="px-4 py-2 border border-gray-200 rounded-xl text-xs">বন্ধ করুন</button>
             </div>
         </div>
     </div>
@@ -406,14 +398,6 @@
             localStorage.setItem('db_history', JSON.stringify(db.history));
             localStorage.setItem('db_trash', JSON.stringify(db.trash));
             renderAll();
-        }
-
-        function exportBackupJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", `MySuperShop_Backup_${new Date().toISOString().slice(0,10)}.json`);
-            dlAnchorElem.click();
         }
 
         function switchTab(tabName) {
@@ -642,13 +626,6 @@
             }
         }
 
-        function restoreTrash(index) {
-            let item = db.trash.splice(index, 1)[0];
-            if(item.trashType === 'Finance') db.finances.push(item);
-            if(item.trashType === 'Ledger') db.dues.push(item);
-            saveData();
-        }
-
         function generateReport() {
             const range = document.getElementById('report-range').value;
             const todayStr = new Date().toISOString().slice(0,10);
@@ -761,20 +738,6 @@
                             <span class="text-xs font-bold ${d.type === 'Receivable' ? 'text-emerald-600' : 'text-rose-600'}">৳ ${d.amount}</span>
                             <button onclick="deleteDue(${d.id})" class="text-gray-400 hover:text-rose-600 text-xs"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
-                    </div>
-                `;
-            });
-
-            const tList = document.getElementById('trash-list');
-            tList.innerHTML = db.trash.length === 0 ? '<p class="text-gray-400 text-center text-xs py-4">ট্র্যাশ বিন খালি</p>' : '';
-            db.trash.forEach((t, index) => {
-                tList.innerHTML += `
-                    <div class="bg-gray-50 p-3 rounded-xl flex justify-between items-center border border-gray-100">
-                        <div>
-                            <p class="font-semibold text-gray-800">${t.category || t.name} (৳${t.amount})</p>
-                            <p class="text-[10px] text-gray-400">ডিলিট: ${t.deletedAt}</p>
-                        </div>
-                        <button onclick="restoreTrash(${index})" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm">রিস্টোর</button>
                     </div>
                 `;
             });
