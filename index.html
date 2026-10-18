@@ -171,7 +171,7 @@
                     </div>
                 </div>
 
-                <!-- NEW AUTO RENEWAL / DUE CYCLE BOX -->
+                <!-- AUTO RENEWAL / DUE CYCLE BOX -->
                 <div onclick="toggleModal('due-cycle-modal')" class="bg-amber-50 border border-amber-200 hover:border-amber-400 p-5 rounded-3xl shadow-sm cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                     <div class="flex items-center justify-between">
                         <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-700 flex items-center justify-center text-xl">
@@ -303,7 +303,7 @@
         </div>
     </div>
 
-    <!-- DUE CYCLE MATCHING MODAL (Auto Date-matching List) -->
+    <!-- DUE CYCLE MATCHING MODAL -->
     <div id="due-cycle-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-3xl p-5 w-full max-w-lg space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-100 pb-3">
@@ -345,7 +345,7 @@
                 <button onclick="toggleModal('profile-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
 
-            <!-- All Field Details clearly organized -->
+            <!-- All Field Details -->
             <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl text-xs space-y-2">
                 <h4 class="font-bold text-slate-700 border-b border-slate-200/60 pb-1.5 flex items-center justify-between">
                     <span>📋 কাস্টমারের পূর্ণাঙ্গ তথ্য</span>
@@ -377,6 +377,19 @@
                 <div>
                     <p class="text-gray-500">বর্তমান বকেয়া</p>
                     <p class="font-bold text-sm text-rose-600 mt-0.5" id="p-total-due">৳ 0</p>
+                </div>
+            </div>
+
+            <!-- NEW: Manual Due Adjustment Box (ভুল বকেয়া ঠিক করার অপশন) -->
+            <div class="bg-amber-50/80 border border-amber-200 p-3 rounded-2xl text-xs space-y-1.5">
+                <label class="font-bold text-amber-900 flex items-center justify-between">
+                    <span><i class="fa-solid fa-wrench text-amber-600 mr-1"></i> বকেয়া ভুল দেখালে সঠিক করুন:</span>
+                </label>
+                <div class="flex gap-2">
+                    <input id="p-manual-due-input" type="number" placeholder="সঠিক বকেয়া টাকার পরিমাণ" class="w-full border border-amber-300 p-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white">
+                    <button onclick="updateManualDue()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-2 rounded-xl transition text-xs whitespace-nowrap shadow-sm">
+                        আপডেট
+                    </button>
                 </div>
             </div>
 
@@ -676,9 +689,8 @@
             toggleModal('customer-modal');
         }
 
-        // Delete Customer Feature
         function deleteCustomer(id, event) {
-            if(event) event.stopPropagation(); // prevent modal opening
+            if(event) event.stopPropagation();
             let c = db.customers.find(item => item.id == id);
             if(!c) return;
 
@@ -729,7 +741,6 @@
             toggleModal('customer-modal');
             saveData();
 
-            // Send Automatic Entry Receipt via WhatsApp upon new registration
             if (!id && newCustomerObj && sendWaEntryMemo) {
                 sendEntryWhatsAppMemo(newCustomerObj);
             }
@@ -766,7 +777,6 @@
             document.getElementById('p-name').innerText = c.name;
             document.getElementById('p-sub-info').innerText = `রুম নম্বর: ${c.room}`;
             
-            // Render All Field Details clearly
             document.getElementById('p-phone').innerText = c.phone || 'N/A';
             document.getElementById('p-whatsapp').innerText = c.whatsapp || c.phone || 'N/A';
             document.getElementById('p-room').innerText = c.room || 'N/A';
@@ -778,12 +788,12 @@
             document.getElementById('p-monthly-bill').innerText = '৳ ' + c.bill;
             document.getElementById('p-total-paid').innerText = '৳ ' + (c.totalPaid || 0);
             document.getElementById('p-total-due').innerText = '৳ ' + c.due;
+            document.getElementById('p-manual-due-input').value = c.due; // set current due in edit box
             document.getElementById('p-status').innerText = c.status;
             document.getElementById('p-signature-input').value = db.signature || '';
             
             document.getElementById('p-edit-btn').onclick = function() { editCustomer(c.id); };
 
-            // Render Payment History with Delete option
             const timelineBox = document.getElementById('p-timeline');
             let customerPayments = db.finances.filter(f => f.type === 'Income' && f.note && f.note.includes(c.name));
             
@@ -812,14 +822,29 @@
             toggleModal('profile-modal');
         }
 
-        // Delete Payment History Entry and readjust customer balance
+        // NEW: Function to manually adjust incorrect due amount
+        function updateManualDue() {
+            if(!currentProfileCustId) return;
+            let c = db.customers.find(item => item.id == currentProfileCustId);
+            if(!c) return;
+
+            const inputVal = document.getElementById('p-manual-due-input').value;
+            if(inputVal === '' || isNaN(inputVal)) return alert("দয়া করে সঠিক টাকার পরিমাণ লিখুন!");
+
+            const newDue = parseFloat(inputVal);
+            if(newDue < 0) return alert("বকেয়ার পরিমাণ ঋণাত্মক হতে পারে না!");
+
+            c.due = newDue;
+            saveData();
+            openCustomerProfile(currentProfileCustId);
+            alert(`"${c.name}"-এর বকেয়া সফলভাবে ৳${newDue} টাকায় আপডেট করা হয়েছে!`);
+        }
+
         function deletePaymentHistory(paymentId, custId) {
             if(confirm("আপনি কি নিশ্চিত যে পেমেন্টের এই এন্ট্রিটি মুছে ফেলতে চান?")) {
                 let pIndex = db.finances.findIndex(f => f.id == paymentId);
                 if(pIndex > -1) {
                     let deletedPayment = db.finances.splice(pIndex, 1)[0];
-                    
-                    // Adjust Customer balance
                     let c = db.customers.find(item => item.id == custId);
                     if(c) {
                         c.due += deletedPayment.amount;
@@ -856,7 +881,6 @@
             return cleanNumber;
         }
 
-        // Send WhatsApp Messages with bKash Number & Signature included
         function sendWhatsAppMessage(type, lastAmount = 0, lastMethod = 'bKash', lastDate = '', prevDue = 0) {
             if(!currentProfileCustId) return;
             let c = db.customers.find(item => item.id == currentProfileCustId);
@@ -868,7 +892,6 @@
             let message = "";
 
             if (type === '1') {
-                // Message 1: Bill Pay Reminder
                 message = `📌 *ওয়াইফাই বিল পরিশোধের রিমাইন্ডার*\n\n` +
                           `প্রিয় ${c.name} (রুম: ${c.room}),\n` +
                           `আপনার চলতি মাসের ওয়াইফাই বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।\n\n` +
@@ -880,7 +903,6 @@
                           `অনুগহ করে দ্রুত বিলটি পরিশোধ করে নিরবচ্ছিন্ন সেবা উপভোগ করুন।\n\n` +
                           `ধন্যবাদ,\n- মাই সুপার শপ`;
             } else if (type === '2') {
-                // Message 2: Detailed Digital Receipt PDF Format
                 let paidAmount = lastAmount || c.bill;
                 let payDate = lastDate || new Date().toISOString().slice(0,10);
                 let sig = db.signature || 'অনুমোদিত স্বাক্ষর';
@@ -1039,7 +1061,6 @@
             }
         }
 
-        // Copy Due Billing Cycle List to Clipboard
         function copyCycleList() {
             const today = new Date();
             const todayDay = today.getDate();
@@ -1114,7 +1135,6 @@
             document.getElementById('box-cust-count').innerText = `${db.customers.length} জন গ্রাহক`;
             document.getElementById('modal-cust-subtitle').innerText = `মোট ${db.customers.length} জন গ্রাহক নিবন্ধিত রয়েছে`;
 
-            // Calculate Today's Date-Matching Due Cycle Customers
             const today = new Date();
             const todayDay = today.getDate();
             let matchingCycleCustomers = db.customers.filter(c => {
@@ -1126,7 +1146,6 @@
             document.getElementById('box-cycle-count').innerText = `${matchingCycleCustomers.length} জন বকেয়া`;
             document.getElementById('cycle-badge').innerText = `${today.toLocaleDateString('bn-BD')}`;
 
-            // Render Cycle Matching List Modal Content
             const cycleListContainer = document.getElementById('cycle-customer-list');
             cycleListContainer.innerHTML = matchingCycleCustomers.length === 0 ? 
                 '<p class="text-gray-400 text-center py-8 text-xs">আজকের তারিখে কোনো রিনিউয়াল বা বকেয়া কাস্টমার নেই</p>' : '';
@@ -1165,7 +1184,6 @@
             if(totalReceivable > 0) document.getElementById('dash-receivable').innerText = '৳ ' + totalReceivable;
             if(totalPayable > 0) document.getElementById('dash-payable').innerText = '৳ ' + totalPayable;
 
-            // RENDER CUSTOMER NAMES WITH DELETE ICON
             const cList = document.getElementById('customer-list');
             cList.innerHTML = db.customers.length === 0 ? '<p class="text-gray-400 text-center py-6 text-xs">কোনো কাস্টমার রেজিস্টার্ড নেই</p>' : '';
             db.customers.forEach(c => {
@@ -1184,7 +1202,6 @@
                             <span class="text-[10px] px-2.5 py-1 rounded-full font-medium ${c.due > 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}">
                                 ${c.due > 0 ? 'বকেয়া ৳' + c.due : 'পরিশোধিত'}
                             </span>
-                            <!-- Delete Customer Button -->
                             <button onclick="deleteCustomer(${c.id}, event)" class="w-7 h-7 rounded-lg bg-gray-200/60 hover:bg-rose-100 text-gray-400 hover:text-rose-600 flex items-center justify-center transition text-xs" title="কাস্টমার মুছে ফেলুন">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
