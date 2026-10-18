@@ -323,7 +323,7 @@
                 <button onclick="toggleModal('profile-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
 
-            <!-- All Field Details clearly organized in a single card -->
+            <!-- All Field Details clearly organized -->
             <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl text-xs space-y-2">
                 <h4 class="font-bold text-slate-700 border-b border-slate-200/60 pb-1.5 flex items-center justify-between">
                     <span>📋 কাস্টমারের পূর্ণাঙ্গ তথ্য</span>
@@ -363,7 +363,7 @@
                 <label class="font-bold text-gray-700 flex items-center gap-1.5">
                     <i class="fa-solid fa-signature text-blue-600"></i> ডিজিটাল মেমো সিগনেচার (অফিসিয়াল সাইন)
                 </label>
-                <input id="p-signature-input" type="text" placeholder="স্বাক্ষরকারীর নাম বা সাইন টেক্সট লিখুন (যেমন: সাইফুল ইসলাম)" 
+                <input id="p-signature-input" type="text" placeholder="স্বাক্ষরকারীর নাম লিখুন (যেমন: সাইফুল ইসলাম)" 
                        onchange="saveSignature(this.value)" 
                        class="w-full border border-gray-300 p-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
             </div>
@@ -379,10 +379,10 @@
                     </div>
                 </div>
 
-                <!-- Two Distinct Message Options -->
+                <!-- WhatsApp Message Sending Options -->
                 <div class="grid grid-cols-2 gap-2 pt-1">
                     <button onclick="sendWhatsAppMessage('1')" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-2 rounded-xl transition flex items-center justify-center gap-1.5 text-[11px] shadow-sm">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> ১. বিল পরিশোধের রিমাইন্ডার
+                        <i class="fa-brands fa-whatsapp text-sm"></i> ১. বিল পরিশোধ রিমাইন্ডার
                     </button>
                     <button onclick="sendWhatsAppMessage('2')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-2 rounded-xl transition flex items-center justify-center gap-1.5 text-[11px] shadow-sm">
                         <i class="fa-solid fa-file-pdf text-sm"></i> ২. বিল প্রাপ্তি PDF রিসিট
@@ -743,8 +743,8 @@
             return cleanNumber;
         }
 
-        // Send Two Distinct Types of Messages (1: Reminder, 2: Paid PDF Receipt)
-        function sendWhatsAppMessage(type, lastAmount = 0, lastMethod = 'Cash', lastDate = '') {
+        // Send Messages (Message 1: Due Reminder, Message 2: Detailed Receipt with Previous Due & Partial Payment Info)
+        function sendWhatsAppMessage(type, lastAmount = 0, lastMethod = 'Cash', lastDate = '', prevDue = 0) {
             if(!currentProfileCustId) return;
             let c = db.customers.find(item => item.id == currentProfileCustId);
             if(!c) return;
@@ -759,30 +759,31 @@
                 message = `📌 *ওয়াইফাই বিল পরিশোধের রিমাইন্ডার*\n\n` +
                           `প্রিয় ${c.name} (রুম: ${c.room}),\n` +
                           `আপনার চলতি মাসের ওয়াইফাই বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।\n\n` +
-                          `• মাসিক বিল: ৳${c.bill}\n` +
-                          `• মোট বকেয়া বিল: ৳${c.due}\n\n` +
-                          `অনুগহ করে দ্রুত বিলটি পরিশোধ করে নিরবচ্ছিন্ন ইন্টারনেট সেবা উপভোগ করুন।\n\n` +
+                          `• নির্ধারিত মাসিক বিল: ৳${c.bill}\n` +
+                          `• বর্তমান মোট বকেয়া: ৳${c.due}\n\n` +
+                          `অনুগহ করে দ্রুত বিলটি পরিশোধ করে নিরবচ্ছিন্ন সেবা উপভোগ করুন।\n\n` +
                           `ধন্যবাদ,\n- মাই সুপার শপ`;
             } else if (type === '2') {
-                // Message 2: Bill Payment Confirmation PDF Memo
+                // Message 2: Detailed Digital Receipt PDF Format
                 let paidAmount = lastAmount || c.bill;
                 let payDate = lastDate || new Date().toISOString().slice(0,10);
                 let sig = db.signature || 'অনুমোদিত স্বাক্ষর';
+                let previousDueAmount = prevDue > 0 ? prevDue : (c.due + paidAmount);
 
-                message = `📄 *[ DIGITAL RECEIPT / বিল পরিশোধ রশিদ ]*\n` +
-                          `----------------------------------\n` +
-                          `গেস্ট/গ্রাহক: ${c.name}\n` +
-                          `রুম নম্বর: ${c.room}\n` +
-                          `মোবাইল: ${c.phone}\n` +
-                          `----------------------------------\n` +
-                          `✅ স্টেটাস: বিল সফলভাবে গ্রহণ করা হয়েছে\n` +
-                          `• পরিষদের তারিখ: ${payDate}\n` +
-                          `• পরিশোধিত পরিমাণ: ৳${paidAmount}\n` +
+                message = `📄 *[ OFFICIAL CASH MEMO / ডিজিটাল বিল রশিদ ]*\n` +
+                          `----------------------------------------------\n` +
+                          `গ্রাহকের নাম: ${c.name}\n` +
+                          `রুম নম্বর: ${c.room}  |  মোবাইল: ${c.phone}\n` +
+                          `----------------------------------------------\n` +
+                          `• নির্ধারিত মাসিক বিল: ৳${c.bill}\n` +
+                          `• মোট বকেয়া (পূর্বের সহ): ৳${previousDueAmount}\n` +
+                          `• আজকের জমার পরিমাণ: ৳${paidAmount}\n` +
                           `• পরিশোধের মাধ্যম: ${lastMethod}\n` +
-                          `• বর্তমান বকেয়া: ৳${c.due}\n` +
-                          `----------------------------------\n` +
+                          `----------------------------------------------\n` +
+                          `🔴 অবশিষ্টাংশ বকেয়া (Current Remaining Due): ৳${c.due}\n` +
+                          `----------------------------------------------\n` +
                           `✍️ ডিজিটাল সাইন: ${sig}\n\n` +
-                          `আপনার বিল পরিশোধ সফল হয়েছে। আমাদের সাথে থাকার জন্য ধন্যবাদ!\n- মাই সুপার শপ`;
+                          `আপনার বিল জমা গ্রহণ করা হয়েছে। আমাদের সাথে থাকার জন্য ধন্যবাদ!\n- মাই সুপার শপ`;
             }
 
             let waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(message)}`;
@@ -799,6 +800,7 @@
 
             let c = db.customers.find(item => item.id == custId);
             if(c && amount > 0) {
+                let prevDue = c.due;
                 c.due = Math.max(0, c.due - amount);
                 c.totalPaid = (c.totalPaid || 0) + amount;
                 
@@ -815,7 +817,7 @@
 
                 if(sendMemo) {
                     currentProfileCustId = custId;
-                    sendWhatsAppMessage('2', amount, method, date);
+                    sendWhatsAppMessage('2', amount, method, date, prevDue);
                 }
 
                 if(!document.getElementById('profile-modal').classList.contains('hidden')) {
