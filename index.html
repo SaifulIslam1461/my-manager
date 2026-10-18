@@ -318,7 +318,7 @@
             <div class="flex justify-between items-start border-b border-gray-100 pb-3">
                 <div>
                     <h3 class="font-bold text-xl text-gray-800" id="p-name">কাস্টমার নাম</h3>
-                    <p class="text-xs text-gray-500 mt-0.5" id="p-sub-info">রুম: --</p>
+                    <p class="text-xs text-gray-500 mt-0.5" id="p-sub-info">রুম নম্বর: --</p>
                 </div>
                 <button onclick="toggleModal('profile-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
@@ -358,7 +358,17 @@
                 </div>
             </div>
 
-            <!-- Action Controls & WhatsApp Reminder -->
+            <!-- Authority Digital Signature Box -->
+            <div class="bg-gray-50 p-3 rounded-2xl border border-gray-200/80 text-xs space-y-1.5">
+                <label class="font-bold text-gray-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-signature text-blue-600"></i> ডিজিটাল মেমো সিগনেচার (অফিসিয়াল সাইন)
+                </label>
+                <input id="p-signature-input" type="text" placeholder="স্বাক্ষরকারীর নাম বা সাইন টেক্সট লিখুন (যেমন: সাইফুল ইসলাম)" 
+                       onchange="saveSignature(this.value)" 
+                       class="w-full border border-gray-300 p-2 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+            </div>
+
+            <!-- Action Controls & WhatsApp Options -->
             <div class="flex flex-col gap-2 bg-gray-50 p-3 rounded-2xl text-xs border border-gray-100">
                 <div class="flex justify-between items-center">
                     <span>স্টেটাস: <strong id="p-status" class="text-blue-600">Active</strong></span>
@@ -368,10 +378,16 @@
                         <button onclick="changeCustStatus('Suspended')" class="bg-amber-100 text-amber-700 px-2 py-1.5 rounded-lg text-[10px]">বন্ধ</button>
                     </div>
                 </div>
-                <!-- WhatsApp Due Reminder Button -->
-                <button onclick="sendWhatsAppReminder()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp বিল রিমাইন্ডার পাঠান
-                </button>
+
+                <!-- Two Distinct Message Options -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="sendWhatsAppMessage('1')" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-2 rounded-xl transition flex items-center justify-center gap-1.5 text-[11px] shadow-sm">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> ১. বিল পরিশোধের রিমাইন্ডার
+                    </button>
+                    <button onclick="sendWhatsAppMessage('2')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-2 rounded-xl transition flex items-center justify-center gap-1.5 text-[11px] shadow-sm">
+                        <i class="fa-solid fa-file-pdf text-sm"></i> ২. বিল প্রাপ্তি PDF রিসিট
+                    </button>
+                </div>
             </div>
 
             <!-- Payment History & Timeline -->
@@ -379,7 +395,7 @@
                 <h4 class="font-bold text-sm text-gray-800 mb-2 flex items-center justify-between">
                     <span><i class="fa-solid fa-receipt text-blue-500 mr-1"></i> বিল পরিশোধের ইতিহাস</span>
                 </h4>
-                <div id="p-timeline" class="space-y-2 max-h-40 overflow-y-auto border border-gray-100 p-3 rounded-2xl bg-gray-50/50 text-xs">
+                <div id="p-timeline" class="space-y-2 max-h-36 overflow-y-auto border border-gray-100 p-3 rounded-2xl bg-gray-50/50 text-xs">
                 </div>
             </div>
 
@@ -431,7 +447,7 @@
             
             <div class="flex items-center gap-2 pt-1 text-xs text-gray-600">
                 <input type="checkbox" id="send-wa-memo" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" checked>
-                <label for="send-wa-memo" class="cursor-pointer">বিল পাওয়ার পর WhatsApp মেমো পাঠান</label>
+                <label for="send-wa-memo" class="cursor-pointer">বিল পাওয়ার পর PDF মানিরিসিট মেসেজ পাঠান</label>
             </div>
 
             <div class="flex justify-end space-x-2 pt-2">
@@ -529,7 +545,8 @@
             recharges: JSON.parse(localStorage.getItem('db_recharges')) || [],
             investments: JSON.parse(localStorage.getItem('db_investments')) || [],
             history: JSON.parse(localStorage.getItem('db_history')) || [],
-            trash: JSON.parse(localStorage.getItem('db_trash')) || []
+            trash: JSON.parse(localStorage.getItem('db_trash')) || [],
+            signature: localStorage.getItem('db_signature') || 'সাইফুল ইসলাম (স্বাক্ষর)'
         };
 
         function saveData() {
@@ -540,7 +557,13 @@
             localStorage.setItem('db_investments', JSON.stringify(db.investments));
             localStorage.setItem('db_history', JSON.stringify(db.history));
             localStorage.setItem('db_trash', JSON.stringify(db.trash));
+            localStorage.setItem('db_signature', db.signature);
             renderAll();
+        }
+
+        function saveSignature(val) {
+            db.signature = val || 'স্বাক্ষরিত';
+            localStorage.setItem('db_signature', db.signature);
         }
 
         function switchTab(tabName) {
@@ -656,7 +679,7 @@
             document.getElementById('p-name').innerText = c.name;
             document.getElementById('p-sub-info').innerText = `রুম নম্বর: ${c.room}`;
             
-            // Render All Saved Fields clearly inside Profile
+            // Render All Field Details clearly
             document.getElementById('p-phone').innerText = c.phone || 'N/A';
             document.getElementById('p-whatsapp').innerText = c.whatsapp || c.phone || 'N/A';
             document.getElementById('p-room').innerText = c.room || 'N/A';
@@ -669,6 +692,7 @@
             document.getElementById('p-total-paid').innerText = '৳ ' + (c.totalPaid || 0);
             document.getElementById('p-total-due').innerText = '৳ ' + c.due;
             document.getElementById('p-status').innerText = c.status;
+            document.getElementById('p-signature-input').value = db.signature || '';
             
             document.getElementById('p-edit-btn').onclick = function() { editCustomer(c.id); };
 
@@ -719,7 +743,8 @@
             return cleanNumber;
         }
 
-        function sendWhatsAppReminder() {
+        // Send Two Distinct Types of Messages (1: Reminder, 2: Paid PDF Receipt)
+        function sendWhatsAppMessage(type, lastAmount = 0, lastMethod = 'Cash', lastDate = '') {
             if(!currentProfileCustId) return;
             let c = db.customers.find(item => item.id == currentProfileCustId);
             if(!c) return;
@@ -727,10 +752,38 @@
             let waNum = formatWhatsAppNumber(c.whatsapp || c.phone);
             if(!waNum) return alert("হোয়াটসঅ্যাপ নম্বরটি সঠিক নয়!");
 
-            let message = `প্রিয় ${c.name} (রুম ${c.room}),\n\nআপনার ওয়াইফাই বিল পরিশোধের সময় হয়েছে।\n\n` +
+            let message = "";
+
+            if (type === '1') {
+                // Message 1: Bill Pay Reminder
+                message = `📌 *ওয়াইফাই বিল পরিশোধের রিমাইন্ডার*\n\n` +
+                          `প্রিয় ${c.name} (রুম: ${c.room}),\n` +
+                          `আপনার চলতি মাসের ওয়াইফাই বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।\n\n` +
                           `• মাসিক বিল: ৳${c.bill}\n` +
-                          `• মোট বকেয়া: ৳${c.due}\n\n` +
-                          `অনুগহ করে দ্রুত বিল পরিশোধ করে নিরবচ্ছিন্ন সেবা উপভোগ করুন। ধন্যবাদ!\n- মাই সুপার শপ`;
+                          `• মোট বকেয়া বিল: ৳${c.due}\n\n` +
+                          `অনুগহ করে দ্রুত বিলটি পরিশোধ করে নিরবচ্ছিন্ন ইন্টারনেট সেবা উপভোগ করুন।\n\n` +
+                          `ধন্যবাদ,\n- মাই সুপার শপ`;
+            } else if (type === '2') {
+                // Message 2: Bill Payment Confirmation PDF Memo
+                let paidAmount = lastAmount || c.bill;
+                let payDate = lastDate || new Date().toISOString().slice(0,10);
+                let sig = db.signature || 'অনুমোদিত স্বাক্ষর';
+
+                message = `📄 *[ DIGITAL RECEIPT / বিল পরিশোধ রশিদ ]*\n` +
+                          `----------------------------------\n` +
+                          `গেস্ট/গ্রাহক: ${c.name}\n` +
+                          `রুম নম্বর: ${c.room}\n` +
+                          `মোবাইল: ${c.phone}\n` +
+                          `----------------------------------\n` +
+                          `✅ স্টেটাস: বিল সফলভাবে গ্রহণ করা হয়েছে\n` +
+                          `• পরিষদের তারিখ: ${payDate}\n` +
+                          `• পরিশোধিত পরিমাণ: ৳${paidAmount}\n` +
+                          `• পরিশোধের মাধ্যম: ${lastMethod}\n` +
+                          `• বর্তমান বকেয়া: ৳${c.due}\n` +
+                          `----------------------------------\n` +
+                          `✍️ ডিজিটাল সাইন: ${sig}\n\n` +
+                          `আপনার বিল পরিশোধ সফল হয়েছে। আমাদের সাথে থাকার জন্য ধন্যবাদ!\n- মাই সুপার শপ`;
+            }
 
             let waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
@@ -761,20 +814,8 @@
                 saveData();
 
                 if(sendMemo) {
-                    let waNum = formatWhatsAppNumber(c.whatsapp || c.phone);
-                    if(waNum) {
-                        let memoMessage = `✅ *বিল প্রাপ্তি স্বীকার ও ধন্যবাদ*\n\n` +
-                                          `প্রিয় ${c.name} (রুম ${c.room}),\n` +
-                                          `আপনার পরিশোধিত ওয়াইফাই বিল সফলভাবে গ্রহণ করা হয়েছে।\n\n` +
-                                          `• গ্রহণের তারিখ: ${date}\n` +
-                                          `• প্রাপ্ত পরিমাণ: ৳${amount}\n` +
-                                          `• মাধ্যম: ${method}\n` +
-                                          `• বর্তমান বকেয়া: ৳${c.due}\n\n` +
-                                          `আমাদের সাথে থাকার জন্য ধন্যবাদ!\n- মাই সুপার শপ`;
-                        
-                        let waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(memoMessage)}`;
-                        window.open(waUrl, '_blank');
-                    }
+                    currentProfileCustId = custId;
+                    sendWhatsAppMessage('2', amount, method, date);
                 }
 
                 if(!document.getElementById('profile-modal').classList.contains('hidden')) {
