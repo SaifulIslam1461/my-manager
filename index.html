@@ -32,12 +32,10 @@
         </div>
     </div>
 
-    <!-- Header Navigation with Beautiful Background Image & Overlay -->
+    <!-- Header Navigation -->
     <header class="relative bg-cover bg-center text-white p-6 shadow-lg sticky top-0 z-50 overflow-hidden" 
             style="background-image: url('https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=1000&auto=format&fit=crop');">
-        <!-- Dark Overlay -->
         <div class="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-indigo-900/80 to-purple-900/85 backdrop-blur-[2px]"></div>
-
         <div class="relative z-10">
             <h1 class="text-2xl font-extrabold tracking-wide flex items-center gap-2 drop-shadow-md">
                 <i class="fa-solid fa-wifi text-blue-400"></i>মাই সুপার শপ
@@ -304,7 +302,7 @@
                 <button onclick="toggleModal('all-customers-modal')" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:text-gray-800 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Customer Dynamic List (ONLY NAMES VISIBLE) -->
+            <!-- Customer Dynamic List -->
             <div id="customer-list" class="space-y-2.5 overflow-y-auto pr-1 flex-1"></div>
 
             <div class="pt-2 border-t border-gray-100 flex justify-between items-center">
@@ -320,12 +318,31 @@
             <div class="flex justify-between items-start border-b border-gray-100 pb-3">
                 <div>
                     <h3 class="font-bold text-xl text-gray-800" id="p-name">কাস্টমার নাম</h3>
-                    <p class="text-xs text-gray-500 mt-0.5" id="p-details">রুম: -- | মোবাইল: --</p>
+                    <p class="text-xs text-gray-500 mt-0.5" id="p-sub-info">রুম: --</p>
                 </div>
                 <button onclick="toggleModal('profile-modal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
 
-            <!-- Detailed Info Box -->
+            <!-- All Field Details clearly organized in a single card -->
+            <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl text-xs space-y-2">
+                <h4 class="font-bold text-slate-700 border-b border-slate-200/60 pb-1.5 flex items-center justify-between">
+                    <span>📋 কাস্টমারের পূর্ণাঙ্গ তথ্য</span>
+                    <button id="p-edit-btn" onclick="" class="text-blue-600 hover:underline text-[11px]"><i class="fa-solid fa-pen-to-square mr-1"></i>এডিট</button>
+                </h4>
+                <div class="grid grid-cols-2 gap-2 text-slate-600">
+                    <p>📱 <strong>মোবাইল:</strong> <span id="p-phone">--</span></p>
+                    <p>💬 <strong>হোয়াটসঅ্যাপ:</strong> <span id="p-whatsapp">--</span></p>
+                    <p>🏠 <strong>রুম নম্বর:</strong> <span id="p-room">--</span></p>
+                    <p>📅 <strong>সংযোগ তারিখ:</strong> <span id="p-conn-date">--</span></p>
+                    <p>💻 <strong>ডিভাইস:</strong> <span id="p-device">--</span></p>
+                    <p>🔌 <strong>টাইপ:</strong> <span id="p-dev-type">--</span></p>
+                </div>
+                <div class="border-t border-slate-200/60 pt-1.5 text-slate-600">
+                    <p>📝 <strong>নোট/বিবরণ:</strong> <span id="p-notes">--</span></p>
+                </div>
+            </div>
+
+            <!-- Financial Summary Box -->
             <div class="grid grid-cols-3 gap-2 bg-blue-50/60 p-3.5 rounded-2xl text-center text-xs border border-blue-100">
                 <div>
                     <p class="text-gray-500">মাসিক বিল</p>
@@ -341,13 +358,20 @@
                 </div>
             </div>
 
-            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-2xl text-xs border border-gray-100">
-                <span>স্টেটাস: <strong id="p-status" class="text-blue-600">Active</strong></span>
-                <div class="space-x-1">
-                    <button onclick="openPayModalFromProfile()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-semibold shadow-sm hover:bg-emerald-700">বিল জমা দিন</button>
-                    <button onclick="changeCustStatus('Active')" class="bg-gray-200 text-gray-700 px-2 py-1.5 rounded-lg text-[10px]">সক্রিয়</button>
-                    <button onclick="changeCustStatus('Suspended')" class="bg-amber-100 text-amber-700 px-2 py-1.5 rounded-lg text-[10px]">বন্ধ</button>
+            <!-- Action Controls & WhatsApp Reminder -->
+            <div class="flex flex-col gap-2 bg-gray-50 p-3 rounded-2xl text-xs border border-gray-100">
+                <div class="flex justify-between items-center">
+                    <span>স্টেটাস: <strong id="p-status" class="text-blue-600">Active</strong></span>
+                    <div class="space-x-1">
+                        <button onclick="openPayModalFromProfile()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-semibold shadow-sm hover:bg-emerald-700">বিল জমা দিন</button>
+                        <button onclick="changeCustStatus('Active')" class="bg-gray-200 text-gray-700 px-2 py-1.5 rounded-lg text-[10px]">সক্রিয়</button>
+                        <button onclick="changeCustStatus('Suspended')" class="bg-amber-100 text-amber-700 px-2 py-1.5 rounded-lg text-[10px]">বন্ধ</button>
+                    </div>
                 </div>
+                <!-- WhatsApp Due Reminder Button -->
+                <button onclick="sendWhatsAppReminder()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp বিল রিমাইন্ডার পাঠান
+                </button>
             </div>
 
             <!-- Payment History & Timeline -->
@@ -355,8 +379,7 @@
                 <h4 class="font-bold text-sm text-gray-800 mb-2 flex items-center justify-between">
                     <span><i class="fa-solid fa-receipt text-blue-500 mr-1"></i> বিল পরিশোধের ইতিহাস</span>
                 </h4>
-                <div id="p-timeline" class="space-y-2 max-h-52 overflow-y-auto border border-gray-100 p-3 rounded-2xl bg-gray-50/50 text-xs">
-                    <!-- Dynamic payment history will render here -->
+                <div id="p-timeline" class="space-y-2 max-h-40 overflow-y-auto border border-gray-100 p-3 rounded-2xl bg-gray-50/50 text-xs">
                 </div>
             </div>
 
@@ -405,6 +428,12 @@
                 <option value="Nagad">নগদ (Nagad)</option>
             </select>
             <input id="pay-note" type="text" placeholder="মাসের নাম / নোট (যেমন: জানুয়ারী বিল)" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm">
+            
+            <div class="flex items-center gap-2 pt-1 text-xs text-gray-600">
+                <input type="checkbox" id="send-wa-memo" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" checked>
+                <label for="send-wa-memo" class="cursor-pointer">বিল পাওয়ার পর WhatsApp মেমো পাঠান</label>
+            </div>
+
             <div class="flex justify-end space-x-2 pt-2">
                 <button onclick="toggleModal('pay-modal')" class="px-4 py-2 border border-gray-200 rounded-xl text-sm">বাতিল</button>
                 <button onclick="submitPayment()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold shadow-md">কনফার্ম</button>
@@ -565,6 +594,27 @@
             toggleModal('customer-modal');
         }
 
+        function editCustomer(id) {
+            let c = db.customers.find(item => item.id == id);
+            if(!c) return;
+            document.getElementById('c-id').value = c.id;
+            document.getElementById('c-name').value = c.name || '';
+            document.getElementById('c-phone').value = c.phone || '';
+            document.getElementById('c-whatsapp').value = c.whatsapp || '';
+            document.getElementById('c-room').value = c.room || '';
+            document.getElementById('c-device').value = c.device || '';
+            document.getElementById('c-dev-type').value = c.devType || '';
+            document.getElementById('c-bill').value = c.bill || '';
+            document.getElementById('c-conn-date').value = c.connDate || new Date().toISOString().slice(0,10);
+            document.getElementById('c-notes').value = c.notes || '';
+            document.getElementById('cust-modal-title').innerText = "কাস্টমার তথ্য আপডেট করুন";
+            
+            if(!document.getElementById('profile-modal').classList.contains('hidden')) {
+                toggleModal('profile-modal');
+            }
+            toggleModal('customer-modal');
+        }
+
         function saveCustomer() {
             const id = document.getElementById('c-id').value;
             const name = document.getElementById('c-name').value;
@@ -604,13 +654,25 @@
             if(!c) return;
             currentProfileCustId = id;
             document.getElementById('p-name').innerText = c.name;
-            document.getElementById('p-details').innerText = `রুম: ${c.room} | মোবাইল: ${c.phone} | সংযোগ: ${c.connDate || 'N/A'}`;
+            document.getElementById('p-sub-info').innerText = `রুম নম্বর: ${c.room}`;
+            
+            // Render All Saved Fields clearly inside Profile
+            document.getElementById('p-phone').innerText = c.phone || 'N/A';
+            document.getElementById('p-whatsapp').innerText = c.whatsapp || c.phone || 'N/A';
+            document.getElementById('p-room').innerText = c.room || 'N/A';
+            document.getElementById('p-conn-date').innerText = c.connDate || 'N/A';
+            document.getElementById('p-device').innerText = c.device || 'N/A';
+            document.getElementById('p-dev-type').innerText = c.devType || 'N/A';
+            document.getElementById('p-notes').innerText = c.notes || 'কোনো বিবরণ নেই';
+
             document.getElementById('p-monthly-bill').innerText = '৳ ' + c.bill;
             document.getElementById('p-total-paid').innerText = '৳ ' + (c.totalPaid || 0);
             document.getElementById('p-total-due').innerText = '৳ ' + c.due;
             document.getElementById('p-status').innerText = c.status;
+            
+            document.getElementById('p-edit-btn').onclick = function() { editCustomer(c.id); };
 
-            // Fetch payment history for this customer
+            // Render Payment History
             const timelineBox = document.getElementById('p-timeline');
             let customerPayments = db.finances.filter(f => f.type === 'Income' && f.note && f.note.includes(c.name));
             
@@ -620,7 +682,7 @@
                 timelineBox.innerHTML = '';
                 customerPayments.slice().reverse().forEach(p => {
                     timelineBox.innerHTML += `
-                        <div class="bg-white p-2.5 rounded-xl border border-gray-100 flex justify-between items-center">
+                        <div class="bg-white p-2.5 rounded-xl border border-gray-100 flex justify-between items-center shadow-xs">
                             <div>
                                 <p class="font-bold text-emerald-600">৳ ${p.amount}</p>
                                 <p class="text-[10px] text-gray-500">${p.note || 'বিল পরিশোধ'}</p>
@@ -644,9 +706,34 @@
             let c = db.customers.find(item => item.id == custId);
             if(!c) return;
             document.getElementById('pay-cust-id').value = custId;
-            document.getElementById('pay-amount').value = c.due;
+            document.getElementById('pay-amount').value = c.due > 0 ? c.due : c.bill;
             document.getElementById('pay-date').value = new Date().toISOString().slice(0,10);
             toggleModal('pay-modal');
+        }
+
+        function formatWhatsAppNumber(phone) {
+            let cleanNumber = phone.replace(/[^0-9]/g, '');
+            if(cleanNumber.startsWith('0')) {
+                cleanNumber = '88' + cleanNumber;
+            }
+            return cleanNumber;
+        }
+
+        function sendWhatsAppReminder() {
+            if(!currentProfileCustId) return;
+            let c = db.customers.find(item => item.id == currentProfileCustId);
+            if(!c) return;
+
+            let waNum = formatWhatsAppNumber(c.whatsapp || c.phone);
+            if(!waNum) return alert("হোয়াটসঅ্যাপ নম্বরটি সঠিক নয়!");
+
+            let message = `প্রিয় ${c.name} (রুম ${c.room}),\n\nআপনার ওয়াইফাই বিল পরিশোধের সময় হয়েছে।\n\n` +
+                          `• মাসিক বিল: ৳${c.bill}\n` +
+                          `• মোট বকেয়া: ৳${c.due}\n\n` +
+                          `অনুগহ করে দ্রুত বিল পরিশোধ করে নিরবচ্ছিন্ন সেবা উপভোগ করুন। ধন্যবাদ!\n- মাই সুপার শপ`;
+
+            let waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
         }
 
         function submitPayment() {
@@ -655,18 +742,41 @@
             const date = document.getElementById('pay-date').value || new Date().toISOString().slice(0,10);
             const method = document.getElementById('pay-method').value;
             const note = document.getElementById('pay-note').value;
+            const sendMemo = document.getElementById('send-wa-memo').checked;
 
             let c = db.customers.find(item => item.id == custId);
             if(c && amount > 0) {
                 c.due = Math.max(0, c.due - amount);
                 c.totalPaid = (c.totalPaid || 0) + amount;
+                
+                let paymentNote = `${c.name} (রুম ${c.room}) - ${note || 'বিল পরিশোধ'} [${method}]`;
+                
                 db.finances.push({
                     id: Date.now(), date, type: 'Income',
                     category: 'WiFi বিল কালেকশন', amount,
-                    note: `${c.name} (রুম ${c.room}) - ${note || 'বিল পরিশোধ'} [${method}]`
+                    note: paymentNote
                 });
+                
                 toggleModal('pay-modal');
                 saveData();
+
+                if(sendMemo) {
+                    let waNum = formatWhatsAppNumber(c.whatsapp || c.phone);
+                    if(waNum) {
+                        let memoMessage = `✅ *বিল প্রাপ্তি স্বীকার ও ধন্যবাদ*\n\n` +
+                                          `প্রিয় ${c.name} (রুম ${c.room}),\n` +
+                                          `আপনার পরিশোধিত ওয়াইফাই বিল সফলভাবে গ্রহণ করা হয়েছে।\n\n` +
+                                          `• গ্রহণের তারিখ: ${date}\n` +
+                                          `• প্রাপ্ত পরিমাণ: ৳${amount}\n` +
+                                          `• মাধ্যম: ${method}\n` +
+                                          `• বর্তমান বকেয়া: ৳${c.due}\n\n` +
+                                          `আমাদের সাথে থাকার জন্য ধন্যবাদ!\n- মাই সুপার শপ`;
+                        
+                        let waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(memoMessage)}`;
+                        window.open(waUrl, '_blank');
+                    }
+                }
+
                 if(!document.getElementById('profile-modal').classList.contains('hidden')) {
                     openCustomerProfile(custId);
                 }
@@ -839,7 +949,7 @@
             if(totalPayable > 0) document.getElementById('dash-payable').innerText = '৳ ' + totalPayable;
             document.getElementById('dash-wifi-profit').innerText = '৳ ' + wifiProfit;
 
-            // RENDER ONLY CUSTOMER NAMES IN LIST
+            // RENDER CUSTOMER NAMES
             const cList = document.getElementById('customer-list');
             cList.innerHTML = db.customers.length === 0 ? '<p class="text-gray-400 text-center py-6 text-xs">কোনো কাস্টমার রেজিস্টার্ড নেই</p>' : '';
             db.customers.forEach(c => {
