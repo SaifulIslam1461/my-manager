@@ -142,10 +142,10 @@
             </div>
         </section>
 
-        <!-- 2. WIFI CUSTOMERS TAB (Redesigned with Unique Small Boxes & Dedicated Customer Management Box) -->
+        <!-- 2. WIFI CUSTOMERS TAB -->
         <section id="tab-wifi" class="hidden space-y-5">
             <div class="flex justify-between items-center flex-wrap gap-2">
-                <h2 class="text-lg font-bold text-gray-800">📶 ওয়াইফাই ম্যানেজমেন্ট ও হিসাব</h2>
+                <h2 class="text-lg font-bold text-gray-800">📶 ওয়াইফাই কাস্টমার ম্যানেজমেন্ট</h2>
                 <div class="flex space-x-1.5">
                     <button onclick="toggleModal('recharge-modal')" class="bg-purple-600 text-white px-3 py-2 rounded-xl text-xs font-semibold shadow-md shadow-purple-500/20 hover:bg-purple-700 transition">+ রিচার্জ</button>
                     <button onclick="toggleModal('investment-modal')" class="bg-indigo-600 text-white px-3 py-2 rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 hover:bg-indigo-700 transition">+ ইনভেস্ট</button>
@@ -153,40 +153,52 @@
                 </div>
             </div>
 
-            <!-- Small Unique & Attractive Stats Boxes -->
+            <!-- Top Summary Boxes Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-3.5 rounded-2xl shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-[11px] text-purple-100">মোট রিচার্জ খরচ</p>
-                        <p class="text-lg font-bold mt-0.5" id="wifi-total-recharge">৳ 0</p>
-                    </div>
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-base">
-                        <i class="fa-solid fa-bolt"></i>
-                    </div>
-                </div>
-
-                <div class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-3.5 rounded-2xl shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-[11px] text-blue-100">মোট ইনভেস্টমেন্ট</p>
-                        <p class="text-lg font-bold mt-0.5" id="wifi-total-invest">৳ 0</p>
-                    </div>
-                    <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-base">
-                        <i class="fa-solid fa-coins"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dedicated Customer Management Box containing Customer List -->
-            <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm space-y-3">
-                <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-                    <h3 class="font-bold text-sm text-gray-800 flex items-center gap-2">
-                        <i class="fa-solid fa-address-book text-blue-600"></i> কাস্টমার ম্যানেজমেন্ট লিস্ট
-                    </h3>
-                    <span class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full font-semibold" id="wifi-cust-badge">মোট: ৩ জন</span>
-                </div>
                 
-                <!-- Customer Dynamic List Container -->
-                <div id="customer-list" class="space-y-3"></div>
+                <!-- CUSTOMER LIST BOX (Custom Light Green Style as per Image) -->
+                <div onclick="toggleModal('all-customers-modal')" class="bg-[#e8f8f0] border border-[#c1ebd6] hover:border-emerald-400 p-5 rounded-3xl shadow-sm cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 text-[#136846] flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-user-group"></i>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-[#136846]/40 group-hover:translate-x-1 transition-transform text-sm"></i>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-xs font-semibold text-[#136846]/80 tracking-wide">মোট গ্রাহক</p>
+                        <h3 class="text-2xl font-black text-[#136846] mt-0.5 tracking-tight">সকল গ্রাহক</h3>
+                    </div>
+                    <div class="mt-2 text-[11px] font-bold text-emerald-700 bg-emerald-500/15 py-1 px-3 rounded-full w-fit" id="box-cust-count">
+                        0 জন গ্রাহক
+                    </div>
+                </div>
+
+                <!-- Recharge Expenses Box -->
+                <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-5 rounded-3xl shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-purple-100 font-semibold">রিচার্জ খরচ</p>
+                        <div class="w-9 h-9 bg-white/20 rounded-2xl flex items-center justify-center text-base">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-2xl font-black mt-0.5" id="wifi-total-recharge">৳ 0</p>
+                    </div>
+                </div>
+
+                <!-- Investment Box -->
+                <div class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-5 rounded-3xl shadow-sm flex flex-col justify-between col-span-2 md:col-span-1">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-blue-100 font-semibold">ইনভেস্টমেন্ট</p>
+                        <div class="w-9 h-9 bg-white/20 rounded-2xl flex items-center justify-center text-base">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-2xl font-black mt-0.5" id="wifi-total-invest">৳ 0</p>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -275,7 +287,35 @@
     </nav>
 
     <!-- MODALS SECTION -->
-    <div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+
+    <!-- ALL CUSTOMERS LIST MODAL (Inside Box Content) -->
+    <div id="all-customers-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-5 w-full max-w-lg space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-gray-800">সকল গ্রাহকের তালিকা</h3>
+                        <p class="text-[11px] text-gray-500" id="modal-cust-subtitle">মোট কাস্টমার বিস্তারিত</p>
+                    </div>
+                </div>
+                <button onclick="toggleModal('all-customers-modal')" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:text-gray-800 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Customer Dynamic List Container inside Modal -->
+            <div id="customer-list" class="space-y-3 overflow-y-auto pr-1 flex-1"></div>
+
+            <div class="pt-2 border-t border-gray-100 flex justify-between items-center">
+                <button onclick="openAddCustomerModal(); toggleModal('all-customers-modal');" class="bg-blue-600 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow hover:bg-blue-700 transition">+ নতুন কাস্টমার</button>
+                <button onclick="toggleModal('all-customers-modal')" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Add/Edit Modal -->
+    <div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto shadow-2xl">
             <h3 class="font-bold text-lg text-blue-600" id="cust-modal-title">স্থায়ী WiFi কাস্টমার যুক্ত করুন</h3>
             <input id="c-id" type="hidden">
@@ -300,7 +340,7 @@
     </div>
 
     <!-- Profile Modal -->
-    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-lg space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl" id="printable-area">
             <div class="flex justify-between items-start border-b border-gray-100 pb-3">
                 <div>
@@ -342,7 +382,7 @@
     </div>
 
     <!-- Pay Modal -->
-    <div id="pay-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div id="pay-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-[60] backdrop-blur-sm">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm space-y-3 shadow-2xl">
             <h3 class="font-bold text-lg text-emerald-600">WiFi বিল গ্রহণ করুন</h3>
             <input id="pay-cust-id" type="hidden">
@@ -738,13 +778,13 @@
             let wifiExpenses = db.finances.filter(f => f.type === 'Expense' && f.category.includes('WiFi')).reduce((sum, f) => sum + f.amount, 0);
             let wifiProfit = wifiIncomes - wifiExpenses;
 
-            // Calculate WiFi specific recharge & investment totals
             let wifiRechargeTotal = db.finances.filter(f => f.type === 'Expense' && f.category.includes('রিচার্জ')).reduce((sum, f) => sum + f.amount, 0);
             let wifiInvestTotal = db.finances.filter(f => f.type === 'Expense' && f.category.includes('মূলধন')).reduce((sum, f) => sum + f.amount, 0);
 
             document.getElementById('wifi-total-recharge').innerText = '৳ ' + wifiRechargeTotal;
             document.getElementById('wifi-total-invest').innerText = '৳ ' + wifiInvestTotal;
-            document.getElementById('wifi-cust-badge').innerText = `মোট: ${db.customers.length} জন`;
+            document.getElementById('box-cust-count').innerText = `${db.customers.length} জন গ্রাহক`;
+            document.getElementById('modal-cust-subtitle').innerText = `মোট ${db.customers.length} জন গ্রাহক নিবন্ধিত রয়েছে`;
 
             if(totalIncome > 0) document.getElementById('dash-income').innerText = '৳ ' + totalIncome;
             if(totalExpense > 0) document.getElementById('dash-expense').innerText = '৳ ' + totalExpense;
@@ -763,7 +803,7 @@
             cList.innerHTML = db.customers.length === 0 ? '<p class="text-gray-400 text-center py-6 text-xs">কোনো কাস্টমার রেজিস্টার্ড নেই</p>' : '';
             db.customers.forEach(c => {
                 cList.innerHTML += `
-                    <div class="bg-gray-50/70 p-3.5 rounded-xl shadow-sm flex justify-between items-center border border-gray-100 relative overflow-hidden">
+                    <div class="bg-gray-50/80 p-3.5 rounded-2xl shadow-sm flex justify-between items-center border border-gray-100 relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-1.5 h-full ${c.due > 0 ? 'bg-rose-500' : 'bg-emerald-500'}"></div>
                         <div class="pl-2">
                             <div class="flex items-center space-x-2">
