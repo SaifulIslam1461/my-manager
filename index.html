@@ -358,6 +358,14 @@
                 </div>
             </div>
 
+            <!-- bKash Info Indicator -->
+            <div class="bg-pink-50 border border-pink-200 text-pink-700 p-2.5 rounded-2xl text-xs flex items-center justify-between font-medium">
+                <span class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-mobile-screen-button text-pink-600 font-bold"></i> বিকাশ পেমেন্ট নম্বর:
+                </span>
+                <strong class="font-bold text-sm tracking-wider">01603146149</strong>
+            </div>
+
             <!-- Authority Digital Signature Box -->
             <div class="bg-gray-50 p-3 rounded-2xl border border-gray-200/80 text-xs space-y-1.5">
                 <label class="font-bold text-gray-700 flex items-center gap-1.5">
@@ -424,6 +432,12 @@
                 <input id="c-conn-date" type="date" class="border border-gray-200 p-2.5 rounded-xl text-sm">
             </div>
             <textarea id="c-notes" placeholder="নোট / বিবরণ" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm h-16"></textarea>
+
+            <div class="flex items-center gap-2 pt-1 text-xs text-gray-600">
+                <input type="checkbox" id="send-entry-wa-memo" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" checked>
+                <label for="send-entry-wa-memo" class="cursor-pointer">কাস্টমার যুক্তের পর হোয়াটসঅ্যাপে রেজিস্ট্রেশন রিসিট পাঠান</label>
+            </div>
+
             <div class="flex justify-end space-x-2 pt-2">
                 <button onclick="toggleModal('customer-modal')" class="px-4 py-2 border border-gray-200 rounded-xl text-sm">বাতিল</button>
                 <button onclick="saveCustomer()" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold shadow-md">সংরক্ষণ করুন</button>
@@ -439,8 +453,8 @@
             <input id="pay-amount" type="number" placeholder="পরিশোধের পরিমাণ (টাকা) *" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm">
             <input id="pay-date" type="date" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm">
             <select id="pay-method" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm bg-gray-50">
-                <option value="Cash">ক্যাশ (Cash)</option>
                 <option value="bKash">বিকাশ (bKash)</option>
+                <option value="Cash">ক্যাশ (Cash)</option>
                 <option value="Nagad">নগদ (Nagad)</option>
             </select>
             <input id="pay-note" type="text" placeholder="মাসের নাম / নোট (যেমন: জানুয়ারী বিল)" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm">
@@ -529,6 +543,8 @@
     <!-- JAVASCRIPT ENGINE -->
     <script>
         const SYSTEM_PIN = "1234";
+        const BKASH_NUMBER = "01603146149";
+
         function unlockApp() {
             const input = document.getElementById('pin-input').value;
             if (input === SYSTEM_PIN) {
@@ -649,8 +665,11 @@
             const bill = parseFloat(document.getElementById('c-bill').value) || 0;
             const connDate = document.getElementById('c-conn-date').value || new Date().toISOString().slice(0,10);
             const notes = document.getElementById('c-notes').value;
+            const sendWaEntryMemo = document.getElementById('send-entry-wa-memo').checked;
 
             if(!name || !phone || !room || !bill) return alert("নাম, ফোন, রুম নম্বর এবং বিলের পরিমাণ আবশ্যক!");
+
+            let newCustomerObj = null;
 
             if(id) {
                 let c = db.customers.find(item => item.id == id);
@@ -660,15 +679,45 @@
                 }
             } else {
                 const newId = Date.now();
-                db.customers.push({
+                newCustomerObj = {
                     id: newId, name, phone, whatsapp, room, device, devType,
                     bill, due: bill, totalPaid: 0, connDate, notes,
                     status: 'Active', created: new Date().toISOString().slice(0,10),
                     lastBilledMonth: connDate.slice(0,7)
-                });
+                };
+                db.customers.push(newCustomerObj);
             }
+            
             toggleModal('customer-modal');
             saveData();
+
+            // Send Automatic Entry Receipt via WhatsApp upon new registration
+            if (!id && newCustomerObj && sendWaEntryMemo) {
+                sendEntryWhatsAppMemo(newCustomerObj);
+            }
+        }
+
+        function sendEntryWhatsAppMemo(c) {
+            let waNum = formatWhatsAppNumber(c.whatsapp || c.phone);
+            if(!waNum) return;
+
+            let sig = db.signature || 'অনুমোদিত স্বাক্ষর';
+            let message = `🎉 *[ REGISTRATION MEMO / ওয়াইফাই কানেকশন স্লিপ ]*\n` +
+                          `----------------------------------------------\n` +
+                          `অভিনন্দন ${c.name}! আমাদের ওয়াইফাই নেটওয়ার্কে যুক্ত হওয়ার জন্য ধন্যবাদ।\n\n` +
+                          `• রুম নম্বর: ${c.room}\n` +
+                          `• মোবাইল নম্বর: ${c.phone}\n` +
+                          `• সংযোগের তারিখ: ${c.connDate}\n` +
+                          `• নির্ধারিত মাসিক বিল: ৳${c.bill}\n` +
+                          `• বর্তমান প্রারম্ভিক বকেয়া: ৳${c.due}\n` +
+                          `----------------------------------------------\n` +
+                          `📱 বিকাশ পেমেন্ট নম্বর (bKash): ${BKASH_NUMBER}\n` +
+                          `----------------------------------------------\n` +
+                          `✍️ ডিজিটাল সাইন: ${sig}\n\n` +
+                          `যেকোনো প্রয়োজনে আমাদের সাথে যোগাযোগ করুন।\n- মাই সুপার শপ`;
+
+            let waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
         }
 
         let currentProfileCustId = null;
@@ -743,8 +792,8 @@
             return cleanNumber;
         }
 
-        // Send Messages (Message 1: Due Reminder, Message 2: Detailed Receipt with Previous Due & Partial Payment Info)
-        function sendWhatsAppMessage(type, lastAmount = 0, lastMethod = 'Cash', lastDate = '', prevDue = 0) {
+        // Send WhatsApp Messages with bKash Number & Signature included
+        function sendWhatsAppMessage(type, lastAmount = 0, lastMethod = 'bKash', lastDate = '', prevDue = 0) {
             if(!currentProfileCustId) return;
             let c = db.customers.find(item => item.id == currentProfileCustId);
             if(!c) return;
@@ -760,7 +809,10 @@
                           `প্রিয় ${c.name} (রুম: ${c.room}),\n` +
                           `আপনার চলতি মাসের ওয়াইফাই বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।\n\n` +
                           `• নির্ধারিত মাসিক বিল: ৳${c.bill}\n` +
-                          `• বর্তমান মোট বকেয়া: ৳${c.due}\n\n` +
+                          `• বর্তমান মোট বকেয়া: ৳${c.due}\n` +
+                          `----------------------------------------------\n` +
+                          `📱 বিকাশ মারফত বিল দিন (bKash): ${BKASH_NUMBER}\n` +
+                          `----------------------------------------------\n` +
                           `অনুগহ করে দ্রুত বিলটি পরিশোধ করে নিরবচ্ছিন্ন সেবা উপভোগ করুন।\n\n` +
                           `ধন্যবাদ,\n- মাই সুপার শপ`;
             } else if (type === '2') {
@@ -782,6 +834,7 @@
                           `----------------------------------------------\n` +
                           `🔴 অবশিষ্টাংশ বকেয়া (Current Remaining Due): ৳${c.due}\n` +
                           `----------------------------------------------\n` +
+                          `📱 বিকাশ নম্বর (bKash): ${BKASH_NUMBER}\n` +
                           `✍️ ডিজিটাল সাইন: ${sig}\n\n` +
                           `আপনার বিল জমা গ্রহণ করা হয়েছে। আমাদের সাথে থাকার জন্য ধন্যবাদ!\n- মাই সুপার শপ`;
             }
