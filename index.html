@@ -152,7 +152,7 @@
             </div>
 
             <!-- Top Summary Boxes Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 
                 <!-- CUSTOMER LIST BOX -->
                 <div onclick="toggleModal('all-customers-modal')" class="bg-[#e8f8f0] border border-[#c1ebd6] hover:border-emerald-400 p-5 rounded-3xl shadow-sm cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
@@ -171,6 +171,23 @@
                     </div>
                 </div>
 
+                <!-- DUE BILLING CYCLE BOX (Auto Date-matching List) -->
+                <div onclick="toggleModal('due-cycle-modal')" class="bg-amber-50 border border-amber-200 hover:border-amber-400 p-5 rounded-3xl shadow-sm cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <span class="bg-amber-200/70 text-amber-800 text-[10px] font-bold px-2.5 py-1 rounded-full" id="cycle-badge">আজকের তারিখ</span>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-xs font-semibold text-amber-800/80 tracking-wide">মাসিক রিনিউয়াল / বিল সাইকেল</p>
+                        <h3 class="text-xl font-black text-amber-900 mt-0.5 tracking-tight">আজকের বিল লিস্ট</h3>
+                    </div>
+                    <div class="mt-2 text-[11px] font-bold text-amber-800 bg-amber-200/50 py-1 px-3 rounded-full w-fit" id="box-cycle-count">
+                        ০ জন বকেয়া
+                    </div>
+                </div>
+
                 <!-- Recharge Expenses Box -->
                 <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-5 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div class="flex items-center justify-between">
@@ -181,19 +198,6 @@
                     </div>
                     <div class="mt-4">
                         <p class="text-2xl font-black mt-0.5" id="wifi-total-recharge">৳ 0</p>
-                    </div>
-                </div>
-
-                <!-- Investment Box -->
-                <div class="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-5 rounded-3xl shadow-sm flex flex-col justify-between col-span-2 md:col-span-1">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-blue-100 font-semibold">ইনভেস্টমেন্ট</p>
-                        <div class="w-9 h-9 bg-white/20 rounded-2xl flex items-center justify-center text-base">
-                            <i class="fa-solid fa-coins"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <p class="text-2xl font-black mt-0.5" id="wifi-total-invest">৳ 0</p>
                     </div>
                 </div>
 
@@ -308,6 +312,37 @@
             <div class="pt-2 border-t border-gray-100 flex justify-between items-center">
                 <button onclick="openAddCustomerModal(); toggleModal('all-customers-modal');" class="bg-blue-600 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow hover:bg-blue-700 transition">+ নতুন কাস্টমার</button>
                 <button onclick="toggleModal('all-customers-modal')" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-gray-200">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DUE CYCLE MATCHING MODAL (Auto Date Matching Box) -->
+    <div id="due-cycle-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-5 w-full max-w-lg space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-gray-800">আজকের রিনিউয়াল / বিল লিস্ট</h3>
+                        <p class="text-[11px] text-gray-500" id="cycle-modal-sub">সংযোগের তারিখের সাথে মিলে যাওয়া কাস্টমারগণ</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="copyCycleList()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1" title="লিস্ট কপি করুন">
+                        <i class="fa-solid fa-copy"></i> কপি লিস্ট
+                    </button>
+                    <button onclick="toggleModal('due-cycle-modal')" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:text-gray-800 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+
+            <!-- Dynamic Matching List Container -->
+            <div id="cycle-customer-list" class="space-y-2.5 overflow-y-auto pr-1 flex-1"></div>
+
+            <div class="pt-2 border-t border-gray-100 flex justify-between items-center">
+                <p class="text-[11px] text-gray-400">বিল পরিশোধ করলে অটোমেটিক তালিকা থেকে সরে যাবে।</p>
+                <button onclick="toggleModal('due-cycle-modal')" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-xs font-semibold">বন্ধ করুন</button>
             </div>
         </div>
     </div>
@@ -656,7 +691,7 @@
 
         // Delete Customer Feature
         function deleteCustomer(id, event) {
-            if(event) event.stopPropagation(); // prevent modal opening
+            if(event) event.stopPropagation();
             let c = db.customers.find(item => item.id == id);
             if(!c) return;
 
@@ -707,7 +742,6 @@
             toggleModal('customer-modal');
             saveData();
 
-            // Send Automatic Entry Receipt via WhatsApp upon new registration
             if (!id && newCustomerObj && sendWaEntryMemo) {
                 sendEntryWhatsAppMemo(newCustomerObj);
             }
@@ -744,7 +778,6 @@
             document.getElementById('p-name').innerText = c.name;
             document.getElementById('p-sub-info').innerText = `রুম নম্বর: ${c.room}`;
             
-            // Render All Field Details clearly
             document.getElementById('p-phone').innerText = c.phone || 'N/A';
             document.getElementById('p-whatsapp').innerText = c.whatsapp || c.phone || 'N/A';
             document.getElementById('p-room').innerText = c.room || 'N/A';
@@ -761,7 +794,6 @@
             
             document.getElementById('p-edit-btn').onclick = function() { editCustomer(c.id); };
 
-            // Render Payment History with Delete option
             const timelineBox = document.getElementById('p-timeline');
             let customerPayments = db.finances.filter(f => f.type === 'Income' && f.note && f.note.includes(c.name));
             
@@ -790,14 +822,11 @@
             toggleModal('profile-modal');
         }
 
-        // Delete Payment History Entry and readjust customer balance
         function deletePaymentHistory(paymentId, custId) {
             if(confirm("আপনি কি নিশ্চিত যে পেমেন্টের এই এন্ট্রিটি মুছে ফেলতে চান?")) {
                 let pIndex = db.finances.findIndex(f => f.id == paymentId);
                 if(pIndex > -1) {
                     let deletedPayment = db.finances.splice(pIndex, 1)[0];
-                    
-                    // Adjust Customer balance
                     let c = db.customers.find(item => item.id == custId);
                     if(c) {
                         c.due += deletedPayment.amount;
@@ -834,7 +863,6 @@
             return cleanNumber;
         }
 
-        // Send WhatsApp Messages with bKash Number & Signature included
         function sendWhatsAppMessage(type, lastAmount = 0, lastMethod = 'bKash', lastDate = '', prevDue = 0) {
             if(!currentProfileCustId) return;
             let c = db.customers.find(item => item.id == currentProfileCustId);
@@ -846,7 +874,6 @@
             let message = "";
 
             if (type === '1') {
-                // Message 1: Bill Pay Reminder
                 message = `📌 *ওয়াইফাই বিল পরিশোধের রিমাইন্ডার*\n\n` +
                           `প্রিয় ${c.name} (রুম: ${c.room}),\n` +
                           `আপনার চলতি মাসের ওয়াইফাই বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।\n\n` +
@@ -858,7 +885,6 @@
                           `অনুগহ করে দ্রুত বিলটি পরিশোধ করে নিরবচ্ছিন্ন সেবা উপভোগ করুন।\n\n` +
                           `ধন্যবাদ,\n- মাই সুপার শপ`;
             } else if (type === '2') {
-                // Message 2: Detailed Digital Receipt PDF Format
                 let paidAmount = lastAmount || c.bill;
                 let payDate = lastDate || new Date().toISOString().slice(0,10);
                 let sig = db.signature || 'অনুমোদিত স্বাক্ষর';
@@ -1017,6 +1043,33 @@
             }
         }
 
+        // Copy Due Billing Cycle List to Clipboard
+        function copyCycleList() {
+            const today = new Date();
+            const todayDay = today.getDate();
+            let matchingCustomers = db.customers.filter(c => {
+                if(!c.connDate || c.status !== 'Active') return false;
+                let cDate = new Date(c.connDate);
+                return cDate.getDate() === todayDay && (c.due > 0);
+            });
+
+            if(matchingCustomers.length === 0) {
+                return alert("আজকের তারিখে কোনো বকেয়া কাস্টমার নেই!");
+            }
+
+            let textToCopy = `📶 *ওয়াইফাই বিল রিনিউয়াল লিস্ট (${today.toLocaleDateString('bn-BD')})*\n\n`;
+            matchingCustomers.forEach((c, index) => {
+                textToCopy += `${index + 1}. ${c.name} (রুম: ${c.room}) - মোবাইল: ${c.phone} - বকেয়া: ৳${c.due}\n`;
+            });
+            textToCopy += `\nবিকাশ নম্বর (bKash): ${BKASH_NUMBER}\n- মাই সুপার শপ`;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("আজকের বিল লিস্ট সফলভাবে কপি করা হয়েছে!");
+            }).catch(err => {
+                alert("কপি করতে সমস্যা হয়েছে।");
+            });
+        }
+
         function generateReport() {
             const range = document.getElementById('report-range').value;
             const todayStr = new Date().toISOString().slice(0,10);
@@ -1073,6 +1126,45 @@
             document.getElementById('wifi-total-invest').innerText = '৳ ' + wifiInvestTotal;
             document.getElementById('box-cust-count').innerText = `${db.customers.length} জন গ্রাহক`;
             document.getElementById('modal-cust-subtitle').innerText = `মোট ${db.customers.length} জন গ্রাহক নিবন্ধিত রয়েছে`;
+
+            // Calculate Today's Date-Matching Due Cycle Customers
+            const today = new Date();
+            const todayDay = today.getDate();
+            let matchingCycleCustomers = db.customers.filter(c => {
+                if(!c.connDate || c.status !== 'Active') return false;
+                let cDate = new Date(c.connDate);
+                return cDate.getDate() === todayDay && (c.due > 0);
+            });
+
+            document.getElementById('box-cycle-count').innerText = `${matchingCycleCustomers.length} জন বকেয়া`;
+            document.getElementById('cycle-badge').innerText = `${today.toLocaleDateString('bn-BD')}`;
+
+            // Render Cycle Matching List Modal Content
+            const cycleListContainer = document.getElementById('cycle-customer-list');
+            cycleListContainer.innerHTML = matchingCycleCustomers.length === 0 ? 
+                '<p class="text-gray-400 text-center py-8 text-xs">আজকের তারিখে কোনো বকেয়া বা রিনিউয়াল কাস্টমার নেই</p>' : '';
+            
+            matchingCycleCustomers.forEach(c => {
+                cycleListContainer.innerHTML += `
+                    <div onclick="openCustomerProfile(${c.id})" class="bg-amber-50/60 hover:bg-amber-100/60 p-3.5 rounded-2xl border border-amber-200/70 flex justify-between items-center cursor-pointer transition group">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center font-bold text-xs">
+                                <i class="fa-solid fa-wifi"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm group-hover:text-amber-900 transition">${c.name}</h4>
+                                <p class="text-[10px] text-gray-500">রুম: ${c.room} | সংযোগ তারিখ: ${c.connDate}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full font-bold">
+                                বকেয়া ৳${c.due}
+                            </span>
+                            <i class="fa-solid fa-chevron-right text-xs text-amber-600"></i>
+                        </div>
+                    </div>
+                `;
+            });
 
             if(totalIncome > 0) document.getElementById('dash-income').innerText = '৳ ' + totalIncome;
             if(totalExpense > 0) document.getElementById('dash-expense').innerText = '৳ ' + totalExpense;
