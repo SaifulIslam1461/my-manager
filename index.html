@@ -654,6 +654,22 @@
             toggleModal('customer-modal');
         }
 
+        // Delete Customer Feature
+        function deleteCustomer(id, event) {
+            if(event) event.stopPropagation(); // prevent modal opening
+            let c = db.customers.find(item => item.id == id);
+            if(!c) return;
+
+            if(confirm(`আপনি কি নিশ্চিত যে কাস্টমার "${c.name}" (রুম ${c.room}) মুছে ফেলতে চান?`)) {
+                let index = db.customers.findIndex(item => item.id == id);
+                if(index > -1) {
+                    let deleted = db.customers.splice(index, 1)[0];
+                    db.trash.push({ ...deleted, trashType: 'Customer', deletedAt: new Date().toLocaleDateString('bn-BD') });
+                    saveData();
+                }
+            }
+        }
+
         function saveCustomer() {
             const id = document.getElementById('c-id').value;
             const name = document.getElementById('c-name').value;
@@ -745,7 +761,7 @@
             
             document.getElementById('p-edit-btn').onclick = function() { editCustomer(c.id); };
 
-            // Render Payment History
+            // Render Payment History with Delete option
             const timelineBox = document.getElementById('p-timeline');
             let customerPayments = db.finances.filter(f => f.type === 'Income' && f.note && f.note.includes(c.name));
             
@@ -760,13 +776,39 @@
                                 <p class="font-bold text-emerald-600">৳ ${p.amount}</p>
                                 <p class="text-[10px] text-gray-500">${p.note || 'বিল পরিশোধ'}</p>
                             </div>
-                            <span class="text-[10px] bg-gray-100 px-2 py-1 rounded-lg text-gray-600 font-medium">${p.date}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] bg-gray-100 px-2 py-1 rounded-lg text-gray-600 font-medium">${p.date}</span>
+                                <button onclick="deletePaymentHistory(${p.id}, ${c.id})" class="text-gray-400 hover:text-rose-600 text-xs p-1" title="ডিলিট করুন">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
             }
 
             toggleModal('profile-modal');
+        }
+
+        // Delete Payment History Entry and readjust customer balance
+        function deletePaymentHistory(paymentId, custId) {
+            if(confirm("আপনি কি নিশ্চিত যে পেমেন্টের এই এন্ট্রিটি মুছে ফেলতে চান?")) {
+                let pIndex = db.finances.findIndex(f => f.id == paymentId);
+                if(pIndex > -1) {
+                    let deletedPayment = db.finances.splice(pIndex, 1)[0];
+                    
+                    // Adjust Customer balance
+                    let c = db.customers.find(item => item.id == custId);
+                    if(c) {
+                        c.due += deletedPayment.amount;
+                        c.totalPaid = Math.max(0, (c.totalPaid || 0) - deletedPayment.amount);
+                    }
+
+                    db.trash.push({ ...deletedPayment, trashType: 'PaymentHistory', deletedAt: new Date().toLocaleDateString('bn-BD') });
+                    saveData();
+                    openCustomerProfile(custId);
+                }
+            }
         }
 
         function openPayModalFromProfile() {
@@ -1045,7 +1087,7 @@
             if(totalPayable > 0) document.getElementById('dash-payable').innerText = '৳ ' + totalPayable;
             document.getElementById('dash-wifi-profit').innerText = '৳ ' + wifiProfit;
 
-            // RENDER CUSTOMER NAMES
+            // RENDER CUSTOMER NAMES WITH DELETE ICON
             const cList = document.getElementById('customer-list');
             cList.innerHTML = db.customers.length === 0 ? '<p class="text-gray-400 text-center py-6 text-xs">কোনো কাস্টমার রেজিস্টার্ড নেই</p>' : '';
             db.customers.forEach(c => {
@@ -1064,6 +1106,10 @@
                             <span class="text-[10px] px-2.5 py-1 rounded-full font-medium ${c.due > 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}">
                                 ${c.due > 0 ? 'বকেয়া ৳' + c.due : 'পরিশোধিত'}
                             </span>
+                            <!-- Delete Customer Button -->
+                            <button onclick="deleteCustomer(${c.id}, event)" class="w-7 h-7 rounded-lg bg-gray-200/60 hover:bg-rose-100 text-gray-400 hover:text-rose-600 flex items-center justify-center transition text-xs" title="কাস্টমার মুছে ফেলুন">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
                             <i class="fa-solid fa-chevron-right text-xs text-gray-300 group-hover:text-emerald-600"></i>
                         </div>
                     </div>
