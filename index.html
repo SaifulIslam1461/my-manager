@@ -152,7 +152,7 @@
             </div>
 
             <!-- Top Summary Boxes Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 
                 <!-- CUSTOMER LIST BOX -->
                 <div onclick="toggleModal('all-customers-modal')" class="bg-[#e8f8f0] border border-[#c1ebd6] hover:border-emerald-400 p-5 rounded-3xl shadow-sm cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
@@ -171,11 +171,11 @@
                     </div>
                 </div>
 
-                <!-- DUE BILLING CYCLE BOX (Auto Date-matching List) -->
+                <!-- NEW AUTO RENEWAL / DUE CYCLE BOX -->
                 <div onclick="toggleModal('due-cycle-modal')" class="bg-amber-50 border border-amber-200 hover:border-amber-400 p-5 rounded-3xl shadow-sm cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                     <div class="flex items-center justify-between">
                         <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-700 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-calendar-days"></i>
+                            <i class="fa-solid fa-calendar-check"></i>
                         </div>
                         <span class="bg-amber-200/70 text-amber-800 text-[10px] font-bold px-2.5 py-1 rounded-full" id="cycle-badge">আজকের তারিখ</span>
                     </div>
@@ -185,19 +185,6 @@
                     </div>
                     <div class="mt-2 text-[11px] font-bold text-amber-800 bg-amber-200/50 py-1 px-3 rounded-full w-fit" id="box-cycle-count">
                         ০ জন বকেয়া
-                    </div>
-                </div>
-
-                <!-- Recharge Expenses Box -->
-                <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-5 rounded-3xl shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-purple-100 font-semibold">রিচার্জ খরচ</p>
-                        <div class="w-9 h-9 bg-white/20 rounded-2xl flex items-center justify-center text-base">
-                            <i class="fa-solid fa-bolt"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <p class="text-2xl font-black mt-0.5" id="wifi-total-recharge">৳ 0</p>
                     </div>
                 </div>
 
@@ -316,7 +303,7 @@
         </div>
     </div>
 
-    <!-- DUE CYCLE MATCHING MODAL (Auto Date Matching Box) -->
+    <!-- DUE CYCLE MATCHING MODAL (Auto Date-matching List) -->
     <div id="due-cycle-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-3xl p-5 w-full max-w-lg space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
             <div class="flex justify-between items-center border-b border-gray-100 pb-3">
@@ -326,7 +313,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-base text-gray-800">আজকের রিনিউয়াল / বিল লিস্ট</h3>
-                        <p class="text-[11px] text-gray-500" id="cycle-modal-sub">সংযোগের তারিখের সাথে মিলে যাওয়া কাস্টমারগণ</p>
+                        <p class="text-[11px] text-gray-500">সংযোগের তারিখের সাথে মিলে যাওয়া বকেয়া কাস্টমারগণ</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5">
@@ -691,7 +678,7 @@
 
         // Delete Customer Feature
         function deleteCustomer(id, event) {
-            if(event) event.stopPropagation();
+            if(event) event.stopPropagation(); // prevent modal opening
             let c = db.customers.find(item => item.id == id);
             if(!c) return;
 
@@ -742,6 +729,7 @@
             toggleModal('customer-modal');
             saveData();
 
+            // Send Automatic Entry Receipt via WhatsApp upon new registration
             if (!id && newCustomerObj && sendWaEntryMemo) {
                 sendEntryWhatsAppMemo(newCustomerObj);
             }
@@ -778,6 +766,7 @@
             document.getElementById('p-name').innerText = c.name;
             document.getElementById('p-sub-info').innerText = `রুম নম্বর: ${c.room}`;
             
+            // Render All Field Details clearly
             document.getElementById('p-phone').innerText = c.phone || 'N/A';
             document.getElementById('p-whatsapp').innerText = c.whatsapp || c.phone || 'N/A';
             document.getElementById('p-room').innerText = c.room || 'N/A';
@@ -794,6 +783,7 @@
             
             document.getElementById('p-edit-btn').onclick = function() { editCustomer(c.id); };
 
+            // Render Payment History with Delete option
             const timelineBox = document.getElementById('p-timeline');
             let customerPayments = db.finances.filter(f => f.type === 'Income' && f.note && f.note.includes(c.name));
             
@@ -822,11 +812,14 @@
             toggleModal('profile-modal');
         }
 
+        // Delete Payment History Entry and readjust customer balance
         function deletePaymentHistory(paymentId, custId) {
             if(confirm("আপনি কি নিশ্চিত যে পেমেন্টের এই এন্ট্রিটি মুছে ফেলতে চান?")) {
                 let pIndex = db.finances.findIndex(f => f.id == paymentId);
                 if(pIndex > -1) {
                     let deletedPayment = db.finances.splice(pIndex, 1)[0];
+                    
+                    // Adjust Customer balance
                     let c = db.customers.find(item => item.id == custId);
                     if(c) {
                         c.due += deletedPayment.amount;
@@ -863,6 +856,7 @@
             return cleanNumber;
         }
 
+        // Send WhatsApp Messages with bKash Number & Signature included
         function sendWhatsAppMessage(type, lastAmount = 0, lastMethod = 'bKash', lastDate = '', prevDue = 0) {
             if(!currentProfileCustId) return;
             let c = db.customers.find(item => item.id == currentProfileCustId);
@@ -874,6 +868,7 @@
             let message = "";
 
             if (type === '1') {
+                // Message 1: Bill Pay Reminder
                 message = `📌 *ওয়াইফাই বিল পরিশোধের রিমাইন্ডার*\n\n` +
                           `প্রিয় ${c.name} (রুম: ${c.room}),\n` +
                           `আপনার চলতি মাসের ওয়াইফাই বিল পরিশোধ করার জন্য অনুরোধ করা হচ্ছে।\n\n` +
@@ -885,6 +880,7 @@
                           `অনুগহ করে দ্রুত বিলটি পরিশোধ করে নিরবচ্ছিন্ন সেবা উপভোগ করুন।\n\n` +
                           `ধন্যবাদ,\n- মাই সুপার শপ`;
             } else if (type === '2') {
+                // Message 2: Detailed Digital Receipt PDF Format
                 let paidAmount = lastAmount || c.bill;
                 let payDate = lastDate || new Date().toISOString().slice(0,10);
                 let sig = db.signature || 'অনুমোদিত স্বাক্ষর';
@@ -1115,15 +1111,6 @@
             let totalReceivable = db.dues.filter(d => d.type === 'Receivable').reduce((sum, d) => sum + d.amount, 0);
             let totalPayable = db.dues.filter(d => d.type === 'Payable').reduce((sum, d) => sum + d.amount, 0);
 
-            let wifiIncomes = db.finances.filter(f => f.type === 'Income' && f.category.includes('WiFi')).reduce((sum, f) => sum + f.amount, 0);
-            let wifiExpenses = db.finances.filter(f => f.type === 'Expense' && f.category.includes('WiFi')).reduce((sum, f) => sum + f.amount, 0);
-            let wifiProfit = wifiIncomes - wifiExpenses;
-
-            let wifiRechargeTotal = db.finances.filter(f => f.type === 'Expense' && f.category.includes('রিচার্জ')).reduce((sum, f) => sum + f.amount, 0);
-            let wifiInvestTotal = db.finances.filter(f => f.type === 'Expense' && f.category.includes('মূলধন')).reduce((sum, f) => sum + f.amount, 0);
-
-            document.getElementById('wifi-total-recharge').innerText = '৳ ' + wifiRechargeTotal;
-            document.getElementById('wifi-total-invest').innerText = '৳ ' + wifiInvestTotal;
             document.getElementById('box-cust-count').innerText = `${db.customers.length} জন গ্রাহক`;
             document.getElementById('modal-cust-subtitle').innerText = `মোট ${db.customers.length} জন গ্রাহক নিবন্ধিত রয়েছে`;
 
@@ -1142,7 +1129,7 @@
             // Render Cycle Matching List Modal Content
             const cycleListContainer = document.getElementById('cycle-customer-list');
             cycleListContainer.innerHTML = matchingCycleCustomers.length === 0 ? 
-                '<p class="text-gray-400 text-center py-8 text-xs">আজকের তারিখে কোনো বকেয়া বা রিনিউয়াল কাস্টমার নেই</p>' : '';
+                '<p class="text-gray-400 text-center py-8 text-xs">আজকের তারিখে কোনো রিনিউয়াল বা বকেয়া কাস্টমার নেই</p>' : '';
             
             matchingCycleCustomers.forEach(c => {
                 cycleListContainer.innerHTML += `
@@ -1177,7 +1164,6 @@
             }
             if(totalReceivable > 0) document.getElementById('dash-receivable').innerText = '৳ ' + totalReceivable;
             if(totalPayable > 0) document.getElementById('dash-payable').innerText = '৳ ' + totalPayable;
-            document.getElementById('dash-wifi-profit').innerText = '৳ ' + wifiProfit;
 
             // RENDER CUSTOMER NAMES WITH DELETE ICON
             const cList = document.getElementById('customer-list');
