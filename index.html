@@ -15,20 +15,157 @@
             #printable-area, #printable-area * { visibility: visible; }
             #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
         }
+
+        /* --- LAMP PULL ANIMATION & LIGHTING STYLES --- */
+        #pin-lock-screen {
+            background-color: #0b0f19;
+            transition: background 0.5s ease;
+        }
+
+        /* Lamp Container Styling */
+        .lamp-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            items-center: center;
+            align-items: center;
+        }
+
+        /* Wire/Cord hanging from top */
+        .lamp-wire {
+            width: 2px;
+            height: 60px;
+            background: #4b5563;
+        }
+
+        /* Lamp Shade */
+        .lamp-shade {
+            width: 120px;
+            height: 55px;
+            background: #1f2937;
+            border-top-left-radius: 60px;
+            border-top-right-radius: 60px;
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+            transition: background 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        /* Interactive Pull Rope */
+        .lamp-rope {
+            position: absolute;
+            right: 25px;
+            top: 55px;
+            width: 2px;
+            height: 90px;
+            background: #9ca3af;
+            cursor: pointer;
+            transition: transform 0.15s ease-in-out;
+        }
+
+        .lamp-rope-handle {
+            position: absolute;
+            bottom: -10px;
+            left: -5px;
+            width: 12px;
+            height: 12px;
+            background: #fbbf24;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .lamp-rope:active {
+            transform: translateY(12px);
+        }
+
+        /* Cone Light Beam when turned ON */
+        .lamp-light-beam {
+            position: absolute;
+            top: 55px;
+            width: 220px;
+            height: 280px;
+            background: linear-gradient(180deg, rgba(254, 240, 138, 0.45) 0%, rgba(254, 240, 138, 0.05) 80%, transparent 100%);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        /* ON state styles */
+        .lamp-on .lamp-shade {
+            background: #fef08a;
+            box-shadow: 0 0 30px #fef08a, inset 0 -4px 10px rgba(255,255,255,0.8);
+        }
+
+        .lamp-on .lamp-light-beam {
+            opacity: 1;
+        }
+
+        /* Panel lighting transition */
+        .pin-card {
+            background-color: #111827;
+            opacity: 0.25;
+            transform: scale(0.98);
+            transition: all 0.5s ease;
+            filter: blur(1px);
+            border: 1px solid #1f2937;
+        }
+
+        .lamp-on .pin-card {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0px);
+            background-color: #1f2937;
+            border-color: #f59e0b;
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.25), 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .lamp-on .pin-card h2 {
+            color: #fef08a;
+        }
+
+        .lamp-on .pin-card p {
+            color: #d1d5db;
+        }
+
+        .lamp-on .pin-card input {
+            background-color: #111827;
+            color: #ffffff;
+            border-color: #374151;
+        }
+
+        .lamp-on .pin-card button {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
     </style>
 </head>
 <body class="text-gray-800 pb-28">
 
-    <!-- Security PIN Modal Lock Screen -->
-    <div id="pin-lock-screen" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-[100] flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-sm text-center space-y-4">
-            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
+    <!-- Security PIN Modal Lock Screen with Lamp Lighting Effect -->
+    <div id="pin-lock-screen" class="fixed inset-0 z-[100] flex flex-col sm:flex-row items-center justify-center p-4 gap-8 select-none">
+        
+        <!-- Lamp Component -->
+        <div id="lamp-container" class="lamp-wrapper">
+            <div class="lamp-wire"></div>
+            <div class="lamp-shade">
+                <div class="lamp-rope" onclick="toggleLamp()" title="লাইট জ্বালাতে টান দিন">
+                    <div class="lamp-rope-handle"></div>
+                </div>
+            </div>
+            <div class="lamp-light-beam"></div>
+            <p class="text-[10px] text-gray-500 mt-2 tracking-wide font-medium">💡 আলো জ্বালতে রশিতে ক্লিক করুন</p>
+        </div>
+
+        <!-- PIN Form Panel -->
+        <div class="pin-card p-6 rounded-2xl w-full max-w-sm text-center space-y-4">
+            <div class="w-16 h-16 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner border border-amber-500/20">
                 <i class="fa-solid fa-lock"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-800">পিন কোড লিখুন</h2>
-            <p class="text-xs text-gray-500">অ্যাপলিকেশনে প্রবেশ করতে ৪ ডিজিটের পিন দিন (ডিফল্ট: 1234)</p>
-            <input type="password" id="pin-input" maxlength="4" placeholder="••••" class="w-full text-center text-2xl tracking-widest border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
-            <button onclick="unlockApp()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-500/30">আনলক করুন</button>
+            <h2 class="text-xl font-bold text-gray-400">পিন কোড লিখুন</h2>
+            <p class="text-xs text-gray-600">অ্যাপলিকেশনে প্রবেশ করতে ৪ ডিজিটের পিন দিন (ডিফল্ট: 1234)</p>
+            <input type="password" id="pin-input" maxlength="4" placeholder="••••" class="w-full text-center text-2xl tracking-widest border border-gray-800 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 bg-gray-900 text-gray-400 transition-all">
+            <button onclick="unlockApp()" class="w-full bg-gray-700 hover:bg-amber-600 text-gray-300 font-bold py-3 rounded-xl transition-all shadow-lg">আনলক করুন</button>
         </div>
     </div>
 
@@ -153,7 +290,7 @@
 
             <!-- Top Summary Boxes Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                
+
                 <!-- CUSTOMER LIST BOX -->
                 <div onclick="toggleModal('all-customers-modal')" class="bg-[#e8f8f0] border border-[#c1ebd6] hover:border-emerald-400 p-5 rounded-3xl shadow-sm cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden">
                     <div class="flex items-center justify-between">
@@ -380,7 +517,7 @@
                 </div>
             </div>
 
-            <!-- NEW: Manual Due Adjustment Box (ভুল বকেয়া ঠিক করার অপশন) -->
+            <!-- Manual Due Adjustment Box -->
             <div class="bg-amber-50/80 border border-amber-200 p-3 rounded-2xl text-xs space-y-1.5">
                 <label class="font-bold text-amber-900 flex items-center justify-between">
                     <span><i class="fa-solid fa-wrench text-amber-600 mr-1"></i> বকেয়া ভুল দেখালে সঠিক করুন:</span>
@@ -493,7 +630,7 @@
                 <option value="Nagad">নগদ (Nagad)</option>
             </select>
             <input id="pay-note" type="text" placeholder="মাসের নাম / নোট (যেমন: জানুয়ারী বিল)" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm">
-            
+
             <div class="flex items-center gap-2 pt-1 text-xs text-gray-600">
                 <input type="checkbox" id="send-wa-memo" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" checked>
                 <label for="send-wa-memo" class="cursor-pointer">বিল পাওয়ার পর PDF মানিরিসিট মেসেজ পাঠান</label>
@@ -579,6 +716,12 @@
     <script>
         const SYSTEM_PIN = "1234";
         const BKASH_NUMBER = "01603146149";
+
+        // LAMP LIGHT TOGGLE FUNCTIONALITY
+        function toggleLamp() {
+            const lockScreen = document.getElementById('pin-lock-screen');
+            lockScreen.classList.toggle('lamp-on');
+        }
 
         function unlockApp() {
             const input = document.getElementById('pin-input').value;
@@ -682,7 +825,7 @@
             document.getElementById('c-conn-date').value = c.connDate || new Date().toISOString().slice(0,10);
             document.getElementById('c-notes').value = c.notes || '';
             document.getElementById('cust-modal-title').innerText = "কাস্টমার তথ্য আপডেট করুন";
-            
+
             if(!document.getElementById('profile-modal').classList.contains('hidden')) {
                 toggleModal('profile-modal');
             }
@@ -737,7 +880,7 @@
                 };
                 db.customers.push(newCustomerObj);
             }
-            
+
             toggleModal('customer-modal');
             saveData();
 
@@ -776,7 +919,7 @@
             currentProfileCustId = id;
             document.getElementById('p-name').innerText = c.name;
             document.getElementById('p-sub-info').innerText = `রুম নম্বর: ${c.room}`;
-            
+
             document.getElementById('p-phone').innerText = c.phone || 'N/A';
             document.getElementById('p-whatsapp').innerText = c.whatsapp || c.phone || 'N/A';
             document.getElementById('p-room').innerText = c.room || 'N/A';
@@ -788,15 +931,15 @@
             document.getElementById('p-monthly-bill').innerText = '৳ ' + c.bill;
             document.getElementById('p-total-paid').innerText = '৳ ' + (c.totalPaid || 0);
             document.getElementById('p-total-due').innerText = '৳ ' + c.due;
-            document.getElementById('p-manual-due-input').value = c.due; // set current due in edit box
+            document.getElementById('p-manual-due-input').value = c.due;
             document.getElementById('p-status').innerText = c.status;
             document.getElementById('p-signature-input').value = db.signature || '';
-            
+
             document.getElementById('p-edit-btn').onclick = function() { editCustomer(c.id); };
 
             const timelineBox = document.getElementById('p-timeline');
             let customerPayments = db.finances.filter(f => f.type === 'Income' && f.note && f.note.includes(c.name));
-            
+
             if (customerPayments.length === 0) {
                 timelineBox.innerHTML = '<p class="text-gray-400 text-center py-4">কোনো বিল পরিশোধের রেকর্ড নেই</p>';
             } else {
@@ -822,7 +965,6 @@
             toggleModal('profile-modal');
         }
 
-        // NEW: Function to manually adjust incorrect due amount
         function updateManualDue() {
             if(!currentProfileCustId) return;
             let c = db.customers.find(item => item.id == currentProfileCustId);
@@ -942,15 +1084,15 @@
                 let prevDue = c.due;
                 c.due = Math.max(0, c.due - amount);
                 c.totalPaid = (c.totalPaid || 0) + amount;
-                
+
                 let paymentNote = `${c.name} (রুম ${c.room}) - ${note || 'বিল পরিশোধ'} [${method}]`;
-                
+
                 db.finances.push({
                     id: Date.now(), date, type: 'Income',
                     category: 'WiFi বিল কালেকশন', amount,
                     note: paymentNote
                 });
-                
+
                 toggleModal('pay-modal');
                 saveData();
 
@@ -1149,7 +1291,7 @@
             const cycleListContainer = document.getElementById('cycle-customer-list');
             cycleListContainer.innerHTML = matchingCycleCustomers.length === 0 ? 
                 '<p class="text-gray-400 text-center py-8 text-xs">আজকের তারিখে কোনো রিনিউয়াল বা বকেয়া কাস্টমার নেই</p>' : '';
-            
+
             matchingCycleCustomers.forEach(c => {
                 cycleListContainer.innerHTML += `
                     <div onclick="openCustomerProfile(${c.id})" class="bg-amber-50/60 hover:bg-amber-100/60 p-3.5 rounded-2xl border border-amber-200/70 flex justify-between items-center cursor-pointer transition group">
